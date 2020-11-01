@@ -1,0 +1,7 @@
+## Git Roll
+/.git-roll
+## Hidden files
+.*
+!/.gitignore
+!.gitattributes
+

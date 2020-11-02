@@ -34,7 +34,6 @@ var remoteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		repo, err := git.OpenRepository(utils.GetPwdOrDie())
 		utils.DieIf(err)
-		defer repo.Free()
 
 		if add {
 			if len(args) < 2 {

@@ -57,7 +57,7 @@ roll:
       then:
         - pull: upstream/master
         - cleanMergedBranches: upstream/master
-        - push: origin
+        - push: origin/master
     - on:
         branch: master
         remote: upstream
@@ -70,4 +70,4 @@ roll:
         - checkout: master
         - pull: upstream/master
         - cleanMergedBranches: upstream/master
-        - push: origin
+        - push: origin/master

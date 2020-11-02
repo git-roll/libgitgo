@@ -18,18 +18,23 @@ package cmd
 import (
 	"fmt"
 	"github.com/git-roll/git-cli/pkg/utils"
+	"os"
 
 	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 )
 
-// addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add [files|.]",
-	Short: "add files in the index",
+var (
+	message = ""
+)
+
+// commitCmd represents the commit command
+var commitCmd = &cobra.Command{
+	Use:   "commit --message [messages]",
+	Short: "commit changes",
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Nothing Added")
+		if len(message) == 0 {
+			fmt.Fprintln(os.Stderr, "--message is required")
 			return
 		}
 
@@ -41,19 +46,22 @@ var addCmd = &cobra.Command{
 		utils.DieIf(err)
 		defer index.Free()
 
-		err = index.AddAll(args, git.IndexAddDefault, func(path string, _ string) int {
-			fmt.Printf("%s added\n", path)
-			return 0
-		})
-
+		treeOid, err := index.WriteTree()
 		utils.DieIf(err)
 
-		err = index.Write()
+		sig, err := repo.DefaultSignature()
 		utils.DieIf(err)
-		fmt.Println("Index Updated")
+
+		head, err := repo.Head()
+		utils.DieIf(err)
+
+		_, err = repo.CreateCommitFromIds("HEAD", sig, sig, message, treeOid, head.Target())
+		utils.DieIf(err)
+		fmt.Println("Committed")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(commitCmd)
+	commitCmd.Flags().StringVar(&message, "message", "", "comment of the commit")
 }

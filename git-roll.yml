@@ -68,6 +68,6 @@ roll:
             merged: upstream/master
       then:
         - checkout: master
-        - pull: origin/master
-        - cleanMergedBranches: origin/master
+        - pull: upstream/master
+        - cleanMergedBranches: upstream/master
         - push: origin

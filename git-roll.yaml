@@ -1,0 +1,73 @@
+version: 1.1
+workflow: github-flow
+roll:
+  pulse:
+    - on:
+        background: true
+        cycle:
+          range: (20s, 2m)
+          reset:
+            - push
+      then:
+        - fetch: upstream
+  quit:
+    - then:
+        - quit
+  tbs:
+    - then:
+        - squash: tbs
+        - push: origin
+  complete:
+    - on:
+        worktree:
+          head:
+            branch!: master
+            merged!: upstream/master
+      then:
+        - commit: force
+        - squash: tbs
+        - amend: ".0"
+        - fetch: upstream
+        - rebase: upstream/master
+        - push: origin
+  worktreeChanged:
+    - on:
+        worktree:
+          clean: false
+          head:
+            branch: master
+      then:
+        - newBranch
+    - on:
+        worktree:
+          clean: false
+          head:
+            branch!: master
+      then:
+        - commit
+        - push: origin
+  branchUpdated:
+    - on:
+        branch: master
+        remote: upstream
+        worktree:
+          clean: true
+          head:
+            branch: master
+      then:
+        - pull: upstream/master
+        - cleanMergedBranches: upstream/master
+        - push: origin
+    - on:
+        branch: master
+        remote: upstream
+        worktree:
+          clean: true
+          head:
+            branch!: master
+            merged: upstream/master
+      then:
+        - checkout: master
+        - pull: origin/master
+        - cleanMergedBranches: origin/master
+        - push: origin

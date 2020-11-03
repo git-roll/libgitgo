@@ -17,20 +17,21 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/git-cli/pkg/refspec"
 	"github.com/git-roll/git-cli/pkg/utils"
 	remoteGit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
-	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
 )
 
-// fetchCmd represents the fetch command
-var fetchCmd = &cobra.Command{
-	Use:   "fetch [remote] [branch]",
-	Short: "fetch remote branches",
+// pushCmd represents the push command
+var pushCmd = &cobra.Command{
+	Use:   "push [remote] [branch]",
+	Short: "push branches to remote",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			fmt.Fprintln(os.Stderr, "remote [branch]")
@@ -40,41 +41,30 @@ var fetchCmd = &cobra.Command{
 		repo, err := remoteGit.PlainOpen(utils.GetPwdOrDie())
 		utils.DieIf(err)
 
-		remote, err := repo.Remote(args[0])
-		utils.DieIf(err)
-
 		var refs []config.RefSpec
 		if len(args) > 1 {
-			for _, fetch := range remote.Config().Fetch {
-				if fetch.Match(plumbing.NewBranchReferenceName(args[1])) {
-					refs = append(refs, fetch)
-				}
-			}
-		} else {
-			refs = remote.Config().Fetch
+			refs = []config.RefSpec{refspec.PushBranch(args[0], args[1])}
 		}
 
 		home, err := os.UserHomeDir()
 		utils.DieIf(err)
-
 		auth, err := ssh.NewPublicKeysFromFile(ssh.DefaultUsername, filepath.Join(home, "Documents/keys/client-test"), "")
 		utils.DieIf(err)
 
-		err = repo.Fetch(&remoteGit.FetchOptions{
+		err = repo.Push(&remoteGit.PushOptions{
 			RemoteName: args[0],
 			RefSpecs:   refs,
 			Auth:       auth,
 			Progress:   os.Stdout,
-			Tags:       0,
+			Prune:      true,
+			Force:      true,
 		})
 
-		fmt.Println("Fetching", args[0])
 		utils.DieIf(err)
-
-		fmt.Println(args[0], "Fetched")
+		fmt.Println(args[0], "Pushed")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(fetchCmd)
+	rootCmd.AddCommand(pushCmd)
 }

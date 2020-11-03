@@ -37,9 +37,8 @@ var initCmd = &cobra.Command{
 			pwd = args[0]
 		}
 
-		repo, err := git.InitRepository(pwd, bare)
+		_, err := git.InitRepository(pwd, bare)
 		utils.DieIf(err)
-		defer repo.Free()
 		fmt.Println("Created")
 	},
 }

@@ -35,11 +35,9 @@ var addCmd = &cobra.Command{
 
 		repo, err := git.OpenRepository(utils.GetPwdOrDie())
 		utils.DieIf(err)
-		defer repo.Free()
 
 		index, err := repo.Index()
 		utils.DieIf(err)
-		defer index.Free()
 
 		err = index.AddAll(args, git.IndexAddDefault, func(path string, _ string) int {
 			fmt.Printf("%s added\n", path)

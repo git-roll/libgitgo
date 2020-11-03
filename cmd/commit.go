@@ -40,11 +40,9 @@ var commitCmd = &cobra.Command{
 
 		repo, err := git.OpenRepository(utils.GetPwdOrDie())
 		utils.DieIf(err)
-		defer repo.Free()
 
 		index, err := repo.Index()
 		utils.DieIf(err)
-		defer index.Free()
 
 		treeOid, err := index.WriteTree()
 		utils.DieIf(err)

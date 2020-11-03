@@ -6,5 +6,5 @@ import (
 )
 
 func PushBranch(remote, branch string) config.RefSpec {
-    return config.RefSpec(fmt.Sprintf("refs/heads/%s:refs/remote/%s/%s", branch, remote, branch))
+    return config.RefSpec(fmt.Sprintf("refs/heads/%s:refs/heads/%s", branch, branch))
 }

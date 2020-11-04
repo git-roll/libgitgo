@@ -17,7 +17,7 @@ roll:
     - then:
         - squash: tbs
         - push: origin
-  complete:
+  pr:
     - on:
         worktree:
           head:

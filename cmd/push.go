@@ -43,7 +43,11 @@ var pushCmd = &cobra.Command{
 
 		var refs []config.RefSpec
 		if len(args) > 1 {
-			refs = []config.RefSpec{refspec.PushBranch(args[0], args[1])}
+			refSpec := refspec.PushBranch(args[0], args[1])
+			err = refSpec.Validate()
+			utils.DieIf(err)
+			fmt.Println(refSpec.String())
+			refs = []config.RefSpec{refSpec}
 		}
 
 		home, err := os.UserHomeDir()
@@ -56,7 +60,6 @@ var pushCmd = &cobra.Command{
 			RefSpecs:   refs,
 			Auth:       auth,
 			Progress:   os.Stdout,
-			Prune:      true,
 			Force:      true,
 		})
 

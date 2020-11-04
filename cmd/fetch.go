@@ -17,14 +17,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/utils"
-	remoteGit "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	"github.com/git-roll/git-cli/pkg/wrapper"
 	"github.com/spf13/cobra"
 	"os"
-	"path/filepath"
 )
 
 // fetchCmd represents the fetch command
@@ -37,41 +32,12 @@ var fetchCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := remoteGit.PlainOpen(utils.GetPwdOrDie())
-		utils.DieIf(err)
-
-		remote, err := repo.Remote(args[0])
-		utils.DieIf(err)
-
-		var refs []config.RefSpec
 		if len(args) > 1 {
-			for _, fetch := range remote.Config().Fetch {
-				if fetch.Match(plumbing.NewBranchReferenceName(args[1])) {
-					refs = append(refs, fetch)
-				}
-			}
-		} else {
-			refs = remote.Config().Fetch
+			wrapper.FetchOrDie(args[0], args[1])
+			return
 		}
 
-		home, err := os.UserHomeDir()
-		utils.DieIf(err)
-
-		auth, err := ssh.NewPublicKeysFromFile(ssh.DefaultUsername, filepath.Join(home, "Documents/keys/client-test"), "")
-		utils.DieIf(err)
-
-		err = repo.Fetch(&remoteGit.FetchOptions{
-			RemoteName: args[0],
-			RefSpecs:   refs,
-			Auth:       auth,
-			Progress:   os.Stdout,
-			Tags:       0,
-		})
-
-		fmt.Println("Fetching", args[0])
-		utils.DieIf(err)
-
-		fmt.Println(args[0], "Fetched")
+		wrapper.FetchOrDie(args[0], "")
 	},
 }
 

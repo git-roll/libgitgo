@@ -17,14 +17,16 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/git-cli/pkg/args"
+	"github.com/git-roll/git-cli/pkg/remote"
 	"github.com/git-roll/git-cli/pkg/utils"
-	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 	"os"
 )
 
 var (
 	add = false
+	argsMap args.Map
 )
 
 // remoteCmd represents the remote command
@@ -32,30 +34,27 @@ var remoteCmd = &cobra.Command{
 	Use:   "remote",
 	Short: "managing remotes",
 	Run: func(cmd *cobra.Command, args []string) {
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
-		utils.DieIf(err)
+		runner := remote.Run(lib, utils.GetPwdOrDie())
+		if runner == nil {
+			fmt.Fprintln(os.Stderr, "uses --lib=git2go or --lib=go-git")
+			return
+		}
 
 		if add {
-			if len(args) < 2 {
-				fmt.Fprintln(os.Stderr, "--add name url")
-				return
-			}
-
-			remote, err := repo.Remotes.Create(args[0], args[1])
+			err := runner.Create(argsMap)
 			utils.DieIf(err)
-			fmt.Println("Remote", remote.Name(), "Added")
+			fmt.Println("Remote Added")
 			return
 		}
 
 		if len(args) == 0 {
-			list, err := repo.Remotes.List()
+			list, err := runner.List()
 			utils.DieIf(err)
 
 			for _, name := range list {
-				remote, err := repo.Remotes.Lookup(name)
+				remote, err := runner.Lookup(name)
 				utils.DieIf(err)
-				fmt.Println(remote.Name(), ":", remote.Url())
-				remote.Free()
+				fmt.Println(remote)
 			}
 
 			return
@@ -66,4 +65,5 @@ var remoteCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(remoteCmd)
 	remoteCmd.Flags().BoolVar(&add, "add", add, "add remote")
+	argsMap = args.Register(remoteCmd.Flags(), remote.Git2GoParams, remote.GoGitParams)
 }

@@ -56,7 +56,7 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 }
 
-func options() *types.Options {
+func options(recommendedLib ...types.PreferredLib) *types.Options {
 	opt := &types.Options{
 		WorkDir:      utils.GetPwdOrDie(),
 	}
@@ -67,6 +67,11 @@ func options() *types.Options {
 	case arg.LibKeyGit2Go:
 		opt.PreferredLib = types.PreferGit2Go
 	default:
+		if len(recommendedLib) > 0 {
+			opt.PreferredLib = recommendedLib[0]
+			break
+		}
+
 		fmt.Fprintln(os.Stderr, "uses --lib=git2go or --lib=go-git")
 		os.Exit(2)
 	}

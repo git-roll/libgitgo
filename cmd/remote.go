@@ -17,16 +17,27 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/args"
-	"github.com/git-roll/git-cli/pkg/remote"
+	"github.com/git-roll/git-cli/pkg/arg"
+	"github.com/git-roll/git-cli/pkg/libgitgo/remote"
 	"github.com/git-roll/git-cli/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
+)
+
+const (
+	ParameterKeyName      = arg.ParameterKey("name")
+	ParameterKeyURL       = arg.ParameterKey("url")
+	ParameterKeyFetchSpec = arg.ParameterKey("fetchSpec")
 )
 
 var (
-	add = false
-	argsMap args.Map
+	Params = []arg.ParameterKey{
+		ParameterKeyName,
+		ParameterKeyURL,
+		ParameterKeyFetchSpec,
+	}
+
+	add     = false
+	argsMap arg.Map
 )
 
 // remoteCmd represents the remote command
@@ -34,27 +45,23 @@ var remoteCmd = &cobra.Command{
 	Use:   "remote",
 	Short: "managing remotes",
 	Run: func(cmd *cobra.Command, args []string) {
-		runner := remote.Run(lib, utils.GetPwdOrDie())
-		if runner == nil {
-			fmt.Fprintln(os.Stderr, "uses --lib=git2go or --lib=go-git")
-			return
-		}
+		opt := options()
 
 		if add {
-			err := runner.Create(argsMap)
+			remote, err := remote.Create(
+				argsMap.Get(ParameterKeyName), argsMap.Get(ParameterKeyURL), argsMap.Get(ParameterKeyFetchSpec),
+				opt)
 			utils.DieIf(err)
-			fmt.Println("Remote Added")
+			fmt.Printf("Remote Added\n%s", remote)
 			return
 		}
 
 		if len(args) == 0 {
-			list, err := runner.List()
+			list, err := remote.List(opt)
 			utils.DieIf(err)
 
-			for _, name := range list {
-				remote, err := runner.Lookup(name)
-				utils.DieIf(err)
-				fmt.Println(remote)
+			for _, remote := range list {
+				fmt.Println(remote.String())
 			}
 
 			return
@@ -65,5 +72,5 @@ var remoteCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(remoteCmd)
 	remoteCmd.Flags().BoolVar(&add, "add", add, "add remote")
-	argsMap = args.Register(remoteCmd.Flags(), remote.Git2GoParams, remote.GoGitParams)
+	argsMap = arg.RegisterCommonFlags(remoteCmd.Flags(), Params)
 }

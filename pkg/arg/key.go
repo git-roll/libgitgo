@@ -1,4 +1,4 @@
-package args
+package arg
 
 import (
     "fmt"
@@ -17,10 +17,14 @@ type ParameterKey string
 type Key string
 
 func ComposeKey(lib LibKey, para ParameterKey) Key {
+    if len(lib) == 0 {
+        return Key(para)
+    }
+
     return Key(fmt.Sprintf("%s.%s", lib, para))
 }
 
-func Register(flagSet *pflag.FlagSet, git2go, gogit []ParameterKey) Map {
+func RegisterFlags(flagSet *pflag.FlagSet, git2go, gogit []ParameterKey) Map {
     m := make(Map, len(git2go) + len(gogit))
     for _, para := range git2go {
         key := ComposeKey(LibKeyGit2Go, para)
@@ -36,6 +40,19 @@ func Register(flagSet *pflag.FlagSet, git2go, gogit []ParameterKey) Map {
         m[key] = &value
 
         flagSet.StringVar(&value, string(key), "", fmt.Sprintf("%s for library %s", para, LibKeyGit2Go))
+    }
+
+    return m
+}
+
+func RegisterCommonFlags(flagSet *pflag.FlagSet, flags []ParameterKey) Map {
+    m := make(Map, len(flags))
+    for _, para := range flags {
+        key := ComposeKey("", para)
+        value := ""
+        m[key] = &value
+
+        flagSet.StringVar(&value, string(key), "", "")
     }
 
     return m

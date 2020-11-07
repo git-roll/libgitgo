@@ -1,11 +1,10 @@
-package args
-
-import (
-    "fmt"
-    "github.com/fatih/structs"
-)
+package arg
 
 type Map map[Key]*string
+
+func OneLineMap(k ParameterKey, v *string) Map  {
+    return Map{Key(k): v}
+}
 
 type LibWrapper struct {
     m Map
@@ -23,7 +22,7 @@ func (w LibWrapper) MustGet(para ParameterKey) (v string, err error) {
     return
 }
 
-func (w LibWrapper) MayGet(para ParameterKey) string {
+func (w LibWrapper) Get(para ParameterKey) string {
     return *w.m[ComposeKey(w.lib, para)]
 }
 
@@ -41,12 +40,6 @@ func (arg Map) GoGitWrapper() *LibWrapper {
     }
 }
 
-type Object map[string]interface{}
-
-func (o Object) String() string {
-    return fmt.Sprintf("%#v", map[string]interface{}(o))
-}
-
-func Normalize(any interface{}) Object {
-    return structs.Map(any)
+func (arg Map) Get(para ParameterKey) string {
+    return *arg[Key(para)]
 }

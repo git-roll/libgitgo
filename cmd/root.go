@@ -17,7 +17,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/args"
+	"github.com/git-roll/git-cli/pkg/arg"
+	"github.com/git-roll/git-cli/pkg/libgitgo/types"
+	"github.com/git-roll/git-cli/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -25,7 +27,7 @@ import (
 )
 
 var (
-	lib args.LibKey
+	lib arg.LibKey
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -46,10 +48,28 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar((*string)(&lib), "lib", "",
-		fmt.Sprintf(`library to use. "%s" or "%s"`, args.LibKeyGit2Go, args.LibKeyGoGit))
+		fmt.Sprintf(`library to use. "%s" or "%s"`, arg.LibKeyGit2Go, arg.LibKeyGoGit))
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
+}
+
+func options() *types.Options {
+	opt := &types.Options{
+		WorkDir:      utils.GetPwdOrDie(),
+	}
+
+	switch lib {
+	case arg.LibKeyGoGit:
+		opt.PreferredLib = types.PreferGoGit
+	case arg.LibKeyGit2Go:
+		opt.PreferredLib = types.PreferGit2Go
+	default:
+		fmt.Fprintln(os.Stderr, "uses --lib=git2go or --lib=go-git")
+		os.Exit(2)
+	}
+
+	return opt
 }

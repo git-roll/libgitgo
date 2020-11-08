@@ -17,15 +17,41 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/git-cli/pkg/arg"
+	"github.com/git-roll/git-cli/pkg/libgitgo/branch"
+	"github.com/git-roll/git-cli/pkg/libgitgo/types"
 	"github.com/git-roll/git-cli/pkg/utils"
-	git "github.com/libgit2/git2go/v31"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
+const (
+	parameterKeyGit2GoType = arg.ParameterKey("type")
+	parameterKeyGit2GoTarget = arg.ParameterKey("target")
+	parameterKeyGit2GoForce  = arg.ParameterKey("force")
+	parameterKeyGoGitRemote  = arg.ParameterKey("remote")
+	parameterKeyGoGitMerge   = arg.ParameterKey("merge")
+	parameterKeyGoGitRebase  = arg.ParameterKey("rebase")
+)
+
 var (
+	branchGit2GoParams = []arg.ParameterKey{
+		parameterKeyGit2GoType,
+		parameterKeyGit2GoTarget,
+		parameterKeyGit2GoForce,
+	}
+
+	branchGoGitParams = []arg.ParameterKey{
+		parameterKeyGoGitRemote,
+		parameterKeyGoGitMerge,
+		parameterKeyGoGitRebase,
+	}
+
+	branchParams = []arg.ParameterKey{
+		parameterKeyName,
+	}
+
 	create = false
+	depArgs, commonArgs arg.Map
 )
 
 // branchCmd represents the branch command
@@ -33,39 +59,38 @@ var branchCmd = &cobra.Command{
 	Use:   "branch",
 	Short: "list or create branches",
 	Run: func(cmd *cobra.Command, args []string) {
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
-		utils.DieIf(err)
+		git2go := depArgs.Git2GoWrapper()
+		gogit := depArgs.GoGitWrapper()
 
 		if !create {
-			bri, err := repo.NewBranchIterator(git.BranchLocal)
+			brs, err := branch.List(
+				&branch.Git2GoListOption{Type: git2go.Get(parameterKeyGit2GoType) },
+				options(types.PreferGit2Go))
 			utils.DieIf(err)
-			err = bri.ForEach(func(br *git.Branch, _ git.BranchType) error{
-				brName, err := br.Name()
-				utils.DieIf(err)
-				fmt.Println(brName, br.SymbolicTarget())
-				return nil
-			})
-			utils.DieIf(err)
+			for _, br := range brs {
+				fmt.Println(br.String())
+			}
+
 			return
 		}
 
-		if len(args) < 1 {
-			fmt.Fprintln(os.Stderr, "branch --new name")
-			return
-		}
-
-		head, err := repo.Head()
+		_, err := branch.Create(commonArgs.Get(parameterKeyName),
+			&branch.Git2GoCreateOption{
+			Target: git2go.Get(parameterKeyGit2GoTarget),
+			Force:  git2go.Get(parameterKeyGit2GoForce) == "true",
+		}, &branch.GoGitCreateOption{
+				Remote: gogit.Get(parameterKeyGoGitRemote),
+				Merge:  gogit.Get(parameterKeyGoGitMerge),
+				Rebase: gogit.Get(parameterKeyGoGitRebase),
+			}, options(types.PreferGit2Go))
 		utils.DieIf(err)
-		headCommit, err := repo.LookupCommit(head.Target())
-		utils.DieIf(err)
-
-		_, err = repo.CreateBranch(args[0], headCommit, false)
-		utils.DieIf(err)
-		fmt.Println(args[0], "Created")
+		fmt.Println("Created")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(branchCmd)
 	branchCmd.Flags().BoolVar(&create, "new", create, "Create a new branch")
+	depArgs = arg.RegisterFlags(branchCmd.Flags(), branchGit2GoParams, branchGoGitParams)
+	commonArgs = arg.RegisterCommonFlags(branchCmd.Flags(), branchParams)
 }

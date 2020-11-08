@@ -24,16 +24,16 @@ import (
 )
 
 const (
-	ParameterKeyName      = arg.ParameterKey("name")
-	ParameterKeyURL       = arg.ParameterKey("url")
-	ParameterKeyFetchSpec = arg.ParameterKey("fetchSpec")
+	parameterKeyName      = arg.ParameterKey("name")
+	parameterKeyURL       = arg.ParameterKey("url")
+	parameterKeyFetchSpec = arg.ParameterKey("fetchSpec")
 )
 
 var (
-	Params = []arg.ParameterKey{
-		ParameterKeyName,
-		ParameterKeyURL,
-		ParameterKeyFetchSpec,
+	remoteParams = []arg.ParameterKey{
+		parameterKeyName,
+		parameterKeyURL,
+		parameterKeyFetchSpec,
 	}
 
 	add     = false
@@ -49,7 +49,7 @@ var remoteCmd = &cobra.Command{
 
 		if add {
 			remote, err := remote.Create(
-				argsMap.Get(ParameterKeyName), argsMap.Get(ParameterKeyURL), argsMap.Get(ParameterKeyFetchSpec),
+				argsMap.Get(parameterKeyName), argsMap.Get(parameterKeyURL), argsMap.Get(parameterKeyFetchSpec),
 				opt)
 			utils.DieIf(err)
 			fmt.Printf("Remote Added\n%s", remote)
@@ -72,5 +72,5 @@ var remoteCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(remoteCmd)
 	remoteCmd.Flags().BoolVar(&add, "add", add, "add remote")
-	argsMap = arg.RegisterCommonFlags(remoteCmd.Flags(), Params)
+	argsMap = arg.RegisterCommonFlags(remoteCmd.Flags(), remoteParams)
 }

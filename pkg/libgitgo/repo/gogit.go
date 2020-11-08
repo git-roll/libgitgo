@@ -6,11 +6,20 @@ import (
 )
 
 type goGit struct {
-    worktree string
+    workdir string
+}
+
+func (g goGit) Open() (*types.Repository, error) {
+    r, err := git.PlainOpen(g.workdir)
+    if err != nil {
+        return nil, err
+    }
+
+    return &types.Repository{GoGit: r}, nil
 }
 
 func (g goGit) Init(bare bool) (repo *types.Repository, err error) {
-    r, err := git.PlainInit(g.worktree, bare)
+    r, err := git.PlainInit(g.workdir, bare)
     if err != nil {
         return
     }

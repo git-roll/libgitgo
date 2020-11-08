@@ -1,9 +1,9 @@
 package remote
 
 import (
-    "github.com/git-roll/git-cli/pkg/libgitgo/types"
-    "github.com/go-git/go-git/v5"
-    "github.com/go-git/go-git/v5/config"
+	"github.com/git-roll/git-cli/pkg/libgitgo/types"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 )
 
 type goGit struct {
@@ -11,64 +11,64 @@ type goGit struct {
 }
 
 func (g goGit) List() (remotes []*types.Remote, err error) {
-    repo, err := git.PlainOpen(g.worktree)
-    if err != nil {
-        return
-    }
+	repo, err := git.PlainOpen(g.worktree)
+	if err != nil {
+		return
+	}
 
-    remoteObjs, err := repo.Remotes()
-    if err != nil {
-        return
-    }
+	remoteObjs, err := repo.Remotes()
+	if err != nil {
+		return
+	}
 
-    for _, remote := range remoteObjs {
-        remotes = append(remotes, &types.Remote{GoGit: remote})
-    }
+	for _, remote := range remoteObjs {
+		remotes = append(remotes, &types.Remote{GoGit: remote})
+	}
 
-    return
+	return
 }
 
 func (g goGit) Create(name, url, fetchSpec string) (remote *types.Remote, err error) {
-    repo, err := git.PlainOpen(g.worktree)
-    if err != nil {
-        return
-    }
+	repo, err := git.PlainOpen(g.worktree)
+	if err != nil {
+		return
+	}
 
-    if len(url) == 0 {
-        panic(name)
-    }
+	if len(url) == 0 {
+		panic(name)
+	}
 
-    conf := &config.RemoteConfig{}
-    conf.URLs = append(conf.URLs, url)
+	conf := &config.RemoteConfig{}
+	conf.URLs = append(conf.URLs, url)
 
-    if len(fetchSpec) > 0 {
-        conf.Fetch = append(conf.Fetch, config.RefSpec(fetchSpec))
-    }
+	if len(fetchSpec) > 0 {
+		conf.Fetch = append(conf.Fetch, config.RefSpec(fetchSpec))
+	}
 
-    var r *git.Remote
-    if len(name) == 0 {
-        r, err = repo.CreateRemoteAnonymous(conf)
-    } else {
-        r, err = repo.CreateRemote(conf)
-    }
+	var r *git.Remote
+	if len(name) == 0 {
+		r, err = repo.CreateRemoteAnonymous(conf)
+	} else {
+		r, err = repo.CreateRemote(conf)
+	}
 
-    if err != nil {
-        return
-    }
+	if err != nil {
+		return
+	}
 
-    return &types.Remote{GoGit: r}, err
+	return &types.Remote{GoGit: r}, err
 }
 
 func (g goGit) Lookup(name string) (remote *types.Remote, err error) {
-    repo, err := git.PlainOpen(g.worktree)
-    if err != nil {
-        return nil, err
-    }
+	repo, err := git.PlainOpen(g.worktree)
+	if err != nil {
+		return nil, err
+	}
 
-    r, err := repo.Remote(name)
-    if err != nil {
-        return nil, err
-    }
+	r, err := repo.Remote(name)
+	if err != nil {
+		return nil, err
+	}
 
-    return &types.Remote{GoGit: r}, err
+	return &types.Remote{GoGit: r}, err
 }

@@ -25,33 +25,33 @@ import (
 )
 
 const (
-	parameterKeyGit2GoType = arg.ParameterKey("type")
-	parameterKeyGit2GoTarget = arg.ParameterKey("target")
-	parameterKeyGit2GoForce  = arg.ParameterKey("force")
-	parameterKeyGoGitRemote  = arg.ParameterKey("remote")
-	parameterKeyGoGitMerge   = arg.ParameterKey("merge")
-	parameterKeyGoGitRebase  = arg.ParameterKey("rebase")
+	parameterKeyType   = arg.ParameterKey("type")
+	parameterKeyTarget = arg.ParameterKey("target")
+	parameterKeyForce  = arg.ParameterKey("force")
+	parameterKeyRemote = arg.ParameterKey("remote")
+	parameterKeyMerge  = arg.ParameterKey("merge")
+	parameterKeyRebase = arg.ParameterKey("rebase")
 )
 
 var (
 	branchGit2GoParams = []arg.ParameterKey{
-		parameterKeyGit2GoType,
-		parameterKeyGit2GoTarget,
-		parameterKeyGit2GoForce,
+		parameterKeyType,
+		parameterKeyTarget,
+		parameterKeyForce,
 	}
 
 	branchGoGitParams = []arg.ParameterKey{
-		parameterKeyGoGitRemote,
-		parameterKeyGoGitMerge,
-		parameterKeyGoGitRebase,
+		parameterKeyRemote,
+		parameterKeyMerge,
+		parameterKeyRebase,
 	}
 
 	branchParams = []arg.ParameterKey{
 		parameterKeyName,
 	}
 
-	create = false
-	depArgs, commonArgs arg.Map
+	create                          = false
+	depBranchArgs, commonBranchArgs arg.Map
 )
 
 // branchCmd represents the branch command
@@ -59,12 +59,12 @@ var branchCmd = &cobra.Command{
 	Use:   "branch",
 	Short: "list or create branches",
 	Run: func(cmd *cobra.Command, args []string) {
-		git2go := depArgs.Git2GoWrapper()
-		gogit := depArgs.GoGitWrapper()
+		git2go := depBranchArgs.Git2GoWrapper()
+		gogit := depBranchArgs.GoGitWrapper()
 
 		if !create {
 			brs, err := branch.List(
-				&branch.Git2GoListOption{Type: git2go.Get(parameterKeyGit2GoType) },
+				&branch.Git2GoListOption{Type: git2go.Get(parameterKeyType) },
 				options(types.PreferGit2Go))
 			utils.DieIf(err)
 			for _, br := range brs {
@@ -74,14 +74,14 @@ var branchCmd = &cobra.Command{
 			return
 		}
 
-		_, err := branch.Create(commonArgs.Get(parameterKeyName),
+		_, err := branch.Create(commonBranchArgs.Get(parameterKeyName),
 			&branch.Git2GoCreateOption{
-			Target: git2go.Get(parameterKeyGit2GoTarget),
-			Force:  git2go.Get(parameterKeyGit2GoForce) == "true",
+			Target: git2go.Get(parameterKeyTarget),
+			Force:  git2go.Get(parameterKeyForce) == "true",
 		}, &branch.GoGitCreateOption{
-				Remote: gogit.Get(parameterKeyGoGitRemote),
-				Merge:  gogit.Get(parameterKeyGoGitMerge),
-				Rebase: gogit.Get(parameterKeyGoGitRebase),
+				Remote: gogit.Get(parameterKeyRemote),
+				Merge:  gogit.Get(parameterKeyMerge),
+				Rebase: gogit.Get(parameterKeyRebase),
 			}, options(types.PreferGit2Go))
 		utils.DieIf(err)
 		fmt.Println("Created")
@@ -91,6 +91,6 @@ var branchCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(branchCmd)
 	branchCmd.Flags().BoolVar(&create, "new", create, "Create a new branch")
-	depArgs = arg.RegisterFlags(branchCmd.Flags(), branchGit2GoParams, branchGoGitParams)
-	commonArgs = arg.RegisterCommonFlags(branchCmd.Flags(), branchParams)
+	depBranchArgs = arg.RegisterFlags(branchCmd.Flags(), branchGit2GoParams, branchGoGitParams)
+	commonBranchArgs = arg.RegisterCommonFlags(branchCmd.Flags(), branchParams)
 }

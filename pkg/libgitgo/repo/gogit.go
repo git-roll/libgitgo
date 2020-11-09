@@ -1,7 +1,7 @@
 package repo
 
 import (
-    "github.com/git-roll/git-cli/pkg/libgitgo/types"
+    "github.com/git-roll/libgitgo/pkg/libgitgo/types"
     "github.com/go-git/go-git/v5"
 )
 

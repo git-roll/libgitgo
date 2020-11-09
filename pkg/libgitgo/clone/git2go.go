@@ -1,7 +1,7 @@
 package clone
 
 import (
-	"github.com/git-roll/git-cli/pkg/libgitgo/types"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	git "github.com/libgit2/git2go/v31"
 )
 

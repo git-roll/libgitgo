@@ -55,7 +55,7 @@ cat > "pkg/libgitgo/$1/api.go" <<EOF
 package $1
 
 import (
-    "github.com/git-roll/git-cli/pkg/libgitgo/types"
+    "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 )
 
 func Open(opt *types.Options) (${ObjectExp} error) {
@@ -84,7 +84,7 @@ cat > "pkg/libgitgo/$1/git2go.go" <<EOF
 package $1
 
 import (
-	"github.com/git-roll/git-cli/pkg/libgitgo/types"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	git "github.com/libgit2/git2go/v31"
 )
 
@@ -103,7 +103,7 @@ cat > "pkg/libgitgo/$1/gogit.go" <<EOF
 package $1
 
 import (
-  "github.com/git-roll/git-cli/pkg/libgitgo/types"
+  "github.com/git-roll/libgitgo/pkg/libgitgo/types"
   "github.com/go-git/go-git/v5"
 )
 

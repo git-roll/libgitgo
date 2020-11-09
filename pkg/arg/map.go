@@ -1,7 +1,7 @@
 package arg
 
 import (
-    "github.com/git-roll/git-cli/pkg/utils"
+    "github.com/git-roll/libgitgo/pkg/utils"
     "strconv"
 )
 

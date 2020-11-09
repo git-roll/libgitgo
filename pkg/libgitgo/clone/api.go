@@ -2,7 +2,7 @@ package clone
 
 import (
     "context"
-    "github.com/git-roll/git-cli/pkg/libgitgo/types"
+    "github.com/git-roll/libgitgo/pkg/libgitgo/types"
     gogit "github.com/go-git/go-git/v5"
     gitgo "github.com/libgit2/git2go/v31"
 )

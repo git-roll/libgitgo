@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/wrapper"
+	"github.com/git-roll/libgitgo/pkg/wrapper"
 	"github.com/spf13/cobra"
 	"os"
 )

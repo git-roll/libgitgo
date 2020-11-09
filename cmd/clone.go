@@ -17,10 +17,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/arg"
-	"github.com/git-roll/git-cli/pkg/libgitgo/clone"
-	"github.com/git-roll/git-cli/pkg/libgitgo/types"
-	"github.com/git-roll/git-cli/pkg/utils"
+	"github.com/git-roll/libgitgo/pkg/arg"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/clone"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
+	"github.com/git-roll/libgitgo/pkg/utils"
 	gogit "github.com/go-git/go-git/v5"
 	gitgo "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"

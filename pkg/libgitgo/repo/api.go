@@ -7,12 +7,12 @@ func Init(bare bool, opt *types.Options) (*types.Repository, error) {
 }
 
 func Open(opt *types.Options) (*types.Repository, error) {
-    return with(opt).Open()
+    return with(opt).Start()
 }
 
 type wrapper interface {
     Init(bare bool) (*types.Repository, error)
-    Open() (*types.Repository, error)
+    Start() (*types.Repository, error)
 }
 
 func with(opt *types.Options) wrapper {

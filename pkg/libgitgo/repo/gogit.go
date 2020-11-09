@@ -9,7 +9,7 @@ type goGit struct {
     workdir string
 }
 
-func (g goGit) Open() (*types.Repository, error) {
+func (g goGit) Start() (*types.Repository, error) {
     r, err := git.PlainOpen(g.workdir)
     if err != nil {
         return nil, err

@@ -9,7 +9,7 @@ type git2go struct {
     workdir string
 }
 
-func (g git2go) Open() (*types.Repository, error) {
+func (g git2go) Start() (*types.Repository, error) {
     r, err := git.OpenRepository(g.workdir)
     if err != nil {
         return nil, err

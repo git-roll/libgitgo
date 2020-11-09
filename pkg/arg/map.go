@@ -1,5 +1,10 @@
 package arg
 
+import (
+    "github.com/git-roll/git-cli/pkg/utils"
+    "strconv"
+)
+
 type Map map[Key]*string
 
 func OneLineMap(k ParameterKey, v *string) Map  {
@@ -24,6 +29,21 @@ func (w LibWrapper) MustGet(para ParameterKey) (v string, err error) {
 
 func (w LibWrapper) Get(para ParameterKey) string {
     return *w.m[ComposeKey(w.lib, para)]
+}
+
+func (w LibWrapper) GetBool(para ParameterKey) bool {
+    return *w.m[ComposeKey(w.lib, para)] == "true"
+}
+
+func (w LibWrapper) GetInt(para ParameterKey) int {
+    t := *w.m[ComposeKey(w.lib, para)]
+    if len(t) == 0 {
+        return 0
+    }
+
+    v, err := strconv.Atoi(t)
+    utils.DieIf(err)
+    return v
 }
 
 func (arg Map) Git2GoWrapper() *LibWrapper {

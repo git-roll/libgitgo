@@ -27,7 +27,8 @@ import (
 )
 
 var (
-	lib arg.LibKey
+	lib                                                      arg.LibKey
+	authUser, authPassword, authSSHIdFile, authSSHPassphrase string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -49,6 +50,10 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar((*string)(&lib), "lib", "",
 		fmt.Sprintf(`library to use. "%s" or "%s"`, arg.LibKeyGit2Go, arg.LibKeyGoGit))
+	rootCmd.PersistentFlags().StringVar(&authUser, "user", "", "username for authentication")
+	rootCmd.PersistentFlags().StringVar(&authPassword, "password", "", "password for the specified username")
+	rootCmd.PersistentFlags().StringVar(&authSSHIdFile, "ssh-id", "~/.ssh/id_rsa", "path to the SSH private key file")
+	rootCmd.PersistentFlags().StringVar(&authSSHPassphrase, "passphrase", "", "passphrase for the specified key file")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -57,8 +62,19 @@ func initConfig() {
 }
 
 func options(recommendedLib ...types.PreferredLib) *types.Options {
+	return optionsWith(utils.GetPwdOrDie(), recommendedLib...)
+}
+
+func optionsWith(workdir string, recommendedLib ...types.PreferredLib) *types.Options {
 	opt := &types.Options{
-		WorkDir:      utils.GetPwdOrDie(),
+		Progress: os.Stdout,
+		WorkDir: workdir,
+		Auth: types.Auth{
+			User:       authUser,
+			Password:   authPassword,
+			SSHId:      authSSHIdFile,
+			Passphrase: authSSHPassphrase,
+		},
 	}
 
 	switch lib {

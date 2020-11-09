@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/utils"
+	"github.com/git-roll/libgitgo/pkg/utils"
 	"os"
 
 	git "github.com/libgit2/git2go/v31"

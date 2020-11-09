@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/git-roll/git-cli/pkg/libgitgo/types"
+import "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 
 func Init(bare bool, opt *types.Options) (*types.Repository, error) {
     return with(opt).Init(bare)

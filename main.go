@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/git-roll/git-cli/cmd"
+import "github.com/git-roll/libgitgo/cmd"
 
 func main() {
 	cmd.Execute()

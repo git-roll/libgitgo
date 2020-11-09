@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/refspec"
-	"github.com/git-roll/git-cli/pkg/utils"
+	"github.com/git-roll/libgitgo/pkg/refspec"
+	"github.com/git-roll/libgitgo/pkg/utils"
 	remoteGit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"

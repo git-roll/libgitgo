@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/arg"
-	"github.com/git-roll/git-cli/pkg/libgitgo/types"
-	"github.com/git-roll/git-cli/pkg/utils"
+	"github.com/git-roll/libgitgo/pkg/arg"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
+	"github.com/git-roll/libgitgo/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 

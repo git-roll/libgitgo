@@ -3,7 +3,7 @@ package clone
 import (
 	"context"
 	"fmt"
-	"github.com/git-roll/git-cli/pkg/libgitgo/types"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband"

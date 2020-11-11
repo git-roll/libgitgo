@@ -39,7 +39,7 @@ const (
 )
 
 var (
-	cloneParams = []arg.ParameterKey {
+	cloneParams = []arg.ParameterKey{
 		parameterKeyURL,
 		parameterKeyBranch,
 		parameterKeyBare,
@@ -73,21 +73,23 @@ var cloneCmd = &cobra.Command{
 		_, err := libclone.Start(url,
 			commonCloneArgs.Get(parameterKeyBranch),
 			commonCloneArgs.Get(parameterKeyBare) == "true",
-			&libclone.Git2GoOption{
-				DownloadTags: getDownloadTags(git2go.Get(parameterKeyDownloadTags)),
-			},
-			&libclone.GoGitOption{
-				RemoteName:            gogit.Get(parameterKeyRemote),
-				SingleBranch:          gogit.GetBool(parameterKeySingleBranch),
-				NoCheckout:            gogit.GetBool(parameterKeyNoCheckout),
-				Depth:                 gogit.GetInt(parameterKeyDepth),
-				SubmoduleRescursivity: getSubmoduleRescursivity(gogit.Get(parameterKeySubModuleRecursivity)),
-				TagMode:               getTagMode(gogit.Get(parameterKeyTagMode)),
+			&libclone.Option{
+				Git2Go: libclone.Git2GoOption{
+					DownloadTags: getDownloadTags(git2go.Get(parameterKeyDownloadTags)),
+				},
+				GoGit: libclone.GoGitOption{
+					RemoteName:            gogit.Get(parameterKeyRemote),
+					SingleBranch:          gogit.GetBool(parameterKeySingleBranch),
+					NoCheckout:            gogit.GetBool(parameterKeyNoCheckout),
+					Depth:                 gogit.GetInt(parameterKeyDepth),
+					SubmoduleRescursivity: getSubmoduleRescursivity(gogit.Get(parameterKeySubModuleRecursivity)),
+					TagMode:               getTagMode(gogit.Get(parameterKeyTagMode)),
+				},
 			},
 			optionsWith(
 				filepath.Join(utils.GetPwdOrDie(), filepath.Base(url)[:len(filepath.Base(url))-len(filepath.Ext(url))]),
 				types.PreferGoGit),
-			)
+		)
 		utils.DieIf(err)
 	},
 }

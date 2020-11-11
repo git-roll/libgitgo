@@ -4,12 +4,21 @@ import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 )
 
+type ListOption struct {
+    Git2Go Git2GoListOption
+}
+
 type Git2GoListOption struct {
     Type string
 }
 
-func List(listOpt *Git2GoListOption, opt *types.Options) ([]*types.Branch, error) {
+func List(listOpt *ListOption, opt *types.Options) ([]*types.Branch, error) {
     return with(opt).List(listOpt)
+}
+
+type CreateOption struct {
+    Git2Go Git2GoCreateOption
+    GoGit GoGitCreateOption
 }
 
 type Git2GoCreateOption struct {
@@ -23,13 +32,13 @@ type GoGitCreateOption struct {
     Rebase string
 }
 
-func Create(name string, createOpt1 *Git2GoCreateOption, createOpt2 *GoGitCreateOption, opt *types.Options) (*types.Branch, error) {
-    return with(opt).Create(name, createOpt1, createOpt2)
+func Create(name string, createOpt *CreateOption, opt *types.Options) (*types.Branch, error) {
+    return with(opt).Create(name, createOpt)
 }
 
 type wrapper interface {
-    List(*Git2GoListOption) ([]*types.Branch, error)
-    Create(name string, createOpt1 *Git2GoCreateOption, createOpt2 *GoGitCreateOption) (*types.Branch, error)
+    List(*ListOption) ([]*types.Branch, error)
+    Create(name string, createOpt *CreateOption) (*types.Branch, error)
 }
 
 func with(opt *types.Options) wrapper {

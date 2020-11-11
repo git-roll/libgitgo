@@ -11,7 +11,8 @@ type goGit struct {
   *types.Options
 }
 
-func (g goGit) Create(name string, _ *Git2GoCreateOption, opt *GoGitCreateOption) (br *types.Branch, err error) {
+func (g goGit) Create(name string, createOpt *CreateOption) (br *types.Branch, err error) {
+  opt := createOpt.GoGit
   repo, err := g.Options.OpenGoGitRepo()
   if err != nil {
     return nil, err
@@ -28,7 +29,7 @@ func (g goGit) Create(name string, _ *Git2GoCreateOption, opt *GoGitCreateOption
   return
 }
 
-func (g goGit) List(_ *Git2GoListOption) (brs []*types.Branch, err error) {
+func (g goGit) List(_ *ListOption) (brs []*types.Branch, err error) {
   repo, err := g.Options.OpenGoGitRepo()
   if err != nil {
     return nil, err

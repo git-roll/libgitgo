@@ -10,7 +10,8 @@ type git2go struct {
 	*types.Options
 }
 
-func (g git2go) Create(name string, opt *Git2GoCreateOption, _ *GoGitCreateOption) (*types.Branch, error) {
+func (g git2go) Create(name string, createOpt *CreateOption) (*types.Branch, error) {
+	opt := createOpt.Git2Go
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return nil, err
@@ -44,14 +45,14 @@ func (g git2go) Create(name string, opt *Git2GoCreateOption, _ *GoGitCreateOptio
 	return &types.Branch{Git2Go: br}, nil
 }
 
-func (g git2go) List(opt *Git2GoListOption) (brs []*types.Branch, err error) {
+func (g git2go) List(opt *ListOption) (brs []*types.Branch, err error) {
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return nil, err
 	}
 
 	var brType git.BranchType
-	switch opt.Type {
+	switch opt.Git2Go.Type {
 	case "BranchLocal":
 		brType = git.BranchLocal
 	case "BranchRemote":

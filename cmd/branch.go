@@ -64,7 +64,7 @@ var branchCmd = &cobra.Command{
 
 		if !create {
 			brs, err := libbranch.List(
-				&libbranch.Git2GoListOption{Type: git2go.Get(parameterKeyType) },
+				&libbranch.ListOption{libbranch.Git2GoListOption{Type: git2go.Get(parameterKeyType) }},
 				options(types.PreferGit2Go))
 			utils.DieIf(err)
 			for _, br := range brs {
@@ -75,13 +75,16 @@ var branchCmd = &cobra.Command{
 		}
 
 		_, err := libbranch.Create(commonBranchArgs.Get(parameterKeyName),
-			&libbranch.Git2GoCreateOption{
-			Target: git2go.Get(parameterKeyTarget),
-			Force:  git2go.Get(parameterKeyForce) == "true",
-		}, &libbranch.GoGitCreateOption{
-				Remote: gogit.Get(parameterKeyRemote),
-				Merge:  gogit.Get(parameterKeyMerge),
-				Rebase: gogit.Get(parameterKeyRebase),
+			&libbranch.CreateOption{
+				Git2Go: libbranch.Git2GoCreateOption{
+					Target: git2go.Get(parameterKeyTarget),
+					Force:  git2go.Get(parameterKeyForce) == "true",
+				},
+				GoGit: libbranch.GoGitCreateOption{
+					Remote: gogit.Get(parameterKeyRemote),
+					Merge:  gogit.Get(parameterKeyMerge),
+					Rebase: gogit.Get(parameterKeyRebase),
+				},
 			}, options(types.PreferGit2Go))
 		utils.DieIf(err)
 		fmt.Println("Created")

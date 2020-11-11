@@ -22,7 +22,7 @@ type goGit struct {
 	auth     *types.Auth
 }
 
-func (g goGit) Start(url string, branch string, bare bool, _ *Git2GoOption, opt *GoGitOption) (*types.Repository, error) {
+func (g goGit) Start(url string, branch string, bare bool, cloneOpt *Option) (*types.Repository, error) {
 	ep, err := transport.NewEndpoint(url)
 	if err != nil {
 		return nil, err
@@ -69,6 +69,7 @@ func (g goGit) Start(url string, branch string, bare bool, _ *Git2GoOption, opt 
 		return nil, fmt.Errorf("unsupported protocol %s", ep.Protocol)
 	}
 
+	opt := cloneOpt.GoGit
 	var refs plumbing.ReferenceName
 	if len(opt.RemoteName) > 0 && len(branch) > 0 {
 		refs = plumbing.NewRemoteReferenceName(opt.RemoteName, branch)

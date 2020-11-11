@@ -6,11 +6,11 @@ import (
 )
 
 type git2go struct {
-	worktree string
+	*types.Options
 }
 
 func (g git2go) Create(name, url, fetchSpec string) (remote *types.Remote, err error) {
-	repo, err := git.OpenRepository(g.worktree)
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (g git2go) Create(name, url, fetchSpec string) (remote *types.Remote, err e
 }
 
 func (g git2go) List() (remotes []*types.Remote, err error) {
-	repo, err := git.OpenRepository(g.worktree)
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return
 	}
@@ -65,7 +65,7 @@ func (g git2go) List() (remotes []*types.Remote, err error) {
 }
 
 func (g git2go) Lookup(name string) (remote *types.Remote, err error) {
-	repo, err := git.OpenRepository(g.worktree)
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return
 	}

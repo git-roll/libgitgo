@@ -3,11 +3,29 @@ package librepo
 import "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 
 func Init(bare bool, opt *types.Options) (*types.Repository, error) {
-    return with(opt).Init(bare)
+    repo, err := with(opt).Init(bare)
+    if err != nil {
+        return nil, err
+    }
+
+    if opt.FollowOpenedRepo {
+        opt.WithRepo(repo)
+    }
+
+    return repo, err
 }
 
 func Open(opt *types.Options) (*types.Repository, error) {
-    return with(opt).Start()
+    repo, err := with(opt).Start()
+    if err != nil {
+        return nil, err
+    }
+
+    if opt.FollowOpenedRepo {
+        opt.WithRepo(repo)
+    }
+
+    return repo, err
 }
 
 type wrapper interface {

@@ -23,7 +23,16 @@ type GoGitOption struct {
 }
 
 func Start(url string, branch string, bare bool, opt1 *Git2GoOption, opt2 *GoGitOption, opt *types.Options) (*types.Repository, error) {
-    return with(opt).Start(url, branch, bare, opt1, opt2)
+    repo, err := with(opt).Start(url, branch, bare, opt1, opt2)
+    if err != nil {
+        return nil, err
+    }
+
+    if opt.FollowOpenedRepo {
+        opt.WithRepo(repo)
+    }
+
+    return repo, err
 }
 
 type wrapper interface {

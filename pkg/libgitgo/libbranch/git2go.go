@@ -7,18 +7,18 @@ import (
 )
 
 type git2go struct {
-	workdir string
+	*types.Options
 }
 
 func (g git2go) Create(name string, opt *Git2GoCreateOption, _ *GoGitCreateOption) (*types.Branch, error) {
-	r, err := git.OpenRepository(g.workdir)
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return nil, err
 	}
 
 	commitOid, err := git.NewOid(opt.Target)
 	if err != nil {
-		target, err := r.References.Lookup(opt.Target)
+		target, err := repo.References.Lookup(opt.Target)
 		if err != nil {
 			return nil, err
 		}
@@ -31,12 +31,12 @@ func (g git2go) Create(name string, opt *Git2GoCreateOption, _ *GoGitCreateOptio
 		commitOid = targetRef.Target()
 	}
 
-	targetCommit, err := r.LookupCommit(commitOid)
+	targetCommit, err := repo.LookupCommit(commitOid)
 	if err != nil {
 		return nil, err
 	}
 
-	br, err := r.CreateBranch(name, targetCommit, opt.Force)
+	br, err := repo.CreateBranch(name, targetCommit, opt.Force)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (g git2go) Create(name string, opt *Git2GoCreateOption, _ *GoGitCreateOptio
 }
 
 func (g git2go) List(opt *Git2GoListOption) (brs []*types.Branch, err error) {
-	r, err := git.OpenRepository(g.workdir)
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (g git2go) List(opt *Git2GoListOption) (brs []*types.Branch, err error) {
 		return nil, fmt.Errorf(`BranchType could be one of "BranchLocal", "BranchRemote", or "BranchAll"`)
 	}
 
-	it, err := r.NewBranchIterator(brType)
+	it, err := repo.NewBranchIterator(brType)
 	if err != nil {
 		return nil, err
 	}

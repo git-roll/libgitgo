@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/git-roll/libgitgo/pkg/arg"
-	"github.com/git-roll/libgitgo/pkg/libgitgo/clone"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libclone"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/git-roll/libgitgo/pkg/utils"
 	gogit "github.com/go-git/go-git/v5"
@@ -70,13 +70,13 @@ var cloneCmd = &cobra.Command{
 		gogit := depCloneArgs.GoGitWrapper()
 
 		url := commonCloneArgs.Get(parameterKeyURL)
-		_, err := clone.Start(url,
+		_, err := libclone.Start(url,
 			commonCloneArgs.Get(parameterKeyBranch),
 			commonCloneArgs.Get(parameterKeyBare) == "true",
-			&clone.Git2GoOption{
+			&libclone.Git2GoOption{
 				DownloadTags: getDownloadTags(git2go.Get(parameterKeyDownloadTags)),
 			},
-			&clone.GoGitOption{
+			&libclone.GoGitOption{
 				RemoteName:            gogit.Get(parameterKeyRemote),
 				SingleBranch:          gogit.GetBool(parameterKeySingleBranch),
 				NoCheckout:            gogit.GetBool(parameterKeyNoCheckout),

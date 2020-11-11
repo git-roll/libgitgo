@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/libgitgo/pkg/libgitgo/repo"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/librepo"
 	"github.com/git-roll/libgitgo/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +31,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initialize an empty repo",
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := repo.Init(bare, options())
+		_, err := librepo.Init(bare, options())
 		utils.DieIf(err)
 		fmt.Println("Created")
 	},

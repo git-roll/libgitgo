@@ -1,4 +1,4 @@
-package repo
+package librepo
 
 import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"

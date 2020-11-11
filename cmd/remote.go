@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/git-roll/libgitgo/pkg/arg"
-	"github.com/git-roll/libgitgo/pkg/libgitgo/remote"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libremote"
 	"github.com/git-roll/libgitgo/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -48,7 +48,7 @@ var remoteCmd = &cobra.Command{
 		opt := options()
 
 		if add {
-			remote, err := remote.Create(
+			remote, err := libremote.Create(
 				argsMap.Get(parameterKeyName), argsMap.Get(parameterKeyURL), argsMap.Get(parameterKeyFetchSpec),
 				opt)
 			utils.DieIf(err)
@@ -57,7 +57,7 @@ var remoteCmd = &cobra.Command{
 		}
 
 		if len(args) == 0 {
-			list, err := remote.List(opt)
+			list, err := libremote.List(opt)
 			utils.DieIf(err)
 
 			for _, remote := range list {

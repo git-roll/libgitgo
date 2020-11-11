@@ -1,4 +1,4 @@
-package remote
+package libremote
 
 import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"

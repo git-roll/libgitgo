@@ -1,4 +1,4 @@
-package branch
+package libbranch
 
 import (
   "github.com/git-roll/libgitgo/pkg/libgitgo/types"

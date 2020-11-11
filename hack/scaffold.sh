@@ -51,7 +51,7 @@ EOF
 fi
 
 echo -n "🐳 Generating interfaces..."
-cat > "pkg/libgitgo/$1/api.go" <<EOF
+cat > "pkg/libgitgo/lib$1/api.go" <<EOF
 package $1
 
 import (
@@ -80,7 +80,7 @@ EOF
 echo "Done"
 
 echo -n "🐳 Generating implementation for git2go..."
-cat > "pkg/libgitgo/$1/git2go.go" <<EOF
+cat > "pkg/libgitgo/lib$1/git2go.go" <<EOF
 package $1
 
 import (
@@ -99,7 +99,7 @@ EOF
 echo "Done"
 
 echo -n "🐳 Generating implementation for go-git..."
-cat > "pkg/libgitgo/$1/gogit.go" <<EOF
+cat > "pkg/libgitgo/lib$1/gogit.go" <<EOF
 package $1
 
 import (

@@ -1,4 +1,4 @@
-package clone
+package libclone
 
 import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"

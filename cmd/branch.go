@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/git-roll/libgitgo/pkg/arg"
-	"github.com/git-roll/libgitgo/pkg/libgitgo/branch"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libbranch"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/git-roll/libgitgo/pkg/utils"
 	"github.com/spf13/cobra"
@@ -63,8 +63,8 @@ var branchCmd = &cobra.Command{
 		gogit := depBranchArgs.GoGitWrapper()
 
 		if !create {
-			brs, err := branch.List(
-				&branch.Git2GoListOption{Type: git2go.Get(parameterKeyType) },
+			brs, err := libbranch.List(
+				&libbranch.Git2GoListOption{Type: git2go.Get(parameterKeyType) },
 				options(types.PreferGit2Go))
 			utils.DieIf(err)
 			for _, br := range brs {
@@ -74,11 +74,11 @@ var branchCmd = &cobra.Command{
 			return
 		}
 
-		_, err := branch.Create(commonBranchArgs.Get(parameterKeyName),
-			&branch.Git2GoCreateOption{
+		_, err := libbranch.Create(commonBranchArgs.Get(parameterKeyName),
+			&libbranch.Git2GoCreateOption{
 			Target: git2go.Get(parameterKeyTarget),
 			Force:  git2go.Get(parameterKeyForce) == "true",
-		}, &branch.GoGitCreateOption{
+		}, &libbranch.GoGitCreateOption{
 				Remote: gogit.Get(parameterKeyRemote),
 				Merge:  gogit.Get(parameterKeyMerge),
 				Rebase: gogit.Get(parameterKeyRebase),

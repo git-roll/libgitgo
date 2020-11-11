@@ -7,11 +7,11 @@ import (
 )
 
 type goGit struct {
-    worktree string
+	*types.Options
 }
 
 func (g goGit) List() (remotes []*types.Remote, err error) {
-	repo, err := git.PlainOpen(g.worktree)
+	repo, err := g.Options.OpenGoGitRepo()
 	if err != nil {
 		return
 	}
@@ -29,7 +29,7 @@ func (g goGit) List() (remotes []*types.Remote, err error) {
 }
 
 func (g goGit) Create(name, url, fetchSpec string) (remote *types.Remote, err error) {
-	repo, err := git.PlainOpen(g.worktree)
+	repo, err := g.Options.OpenGoGitRepo()
 	if err != nil {
 		return
 	}
@@ -60,7 +60,7 @@ func (g goGit) Create(name, url, fetchSpec string) (remote *types.Remote, err er
 }
 
 func (g goGit) Lookup(name string) (remote *types.Remote, err error) {
-	repo, err := git.PlainOpen(g.worktree)
+	repo, err := g.Options.OpenGoGitRepo()
 	if err != nil {
 		return nil, err
 	}

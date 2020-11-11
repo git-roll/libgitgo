@@ -25,9 +25,9 @@ type wrapper interface {
 func with(opt *types.Options) wrapper {
     switch opt.PreferredLib {
     case types.PreferGoGit:
-        return &goGit{worktree: opt.WorkDir}
+        return &goGit{opt}
     case types.PreferGit2Go:
-        return &git2go{worktree: opt.WorkDir}
+        return &git2go{opt}
     }
 
     return nil

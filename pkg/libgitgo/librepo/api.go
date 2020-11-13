@@ -38,8 +38,8 @@ func with(opt *types.Options) wrapper {
     case types.PreferGoGit:
         return &goGit{workdir: opt.WorkDir}
     case types.PreferGit2Go:
+        fallthrough
+    default:
         return &git2go{workdir: opt.WorkDir}
     }
-
-    return nil
 }

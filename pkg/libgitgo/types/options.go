@@ -28,7 +28,7 @@ func (opt *Options) WithRepo(repo *Repository) {
 }
 
 func (opt *Options) OpenGoGitRepo() (repo *gogit.Repository, err error) {
-	if opt.CtxRepo != nil {
+	if opt.CtxRepo != nil && opt.CtxRepo.GoGit != nil {
 		repo = opt.CtxRepo.GoGit
 		return
 	}
@@ -38,12 +38,17 @@ func (opt *Options) OpenGoGitRepo() (repo *gogit.Repository, err error) {
 		return nil, err
 	}
 
+	if opt.CtxRepo != nil {
+		opt.CtxRepo.GoGit = repo
+		return
+	}
+
 	opt.WithRepo(&Repository{GoGit: repo})
 	return
 }
 
 func (opt *Options) OpenGit2GoRepo() (repo *gitgo.Repository, err error) {
-	if opt.CtxRepo != nil {
+	if opt.CtxRepo != nil && opt.CtxRepo.Git2Go != nil {
 		repo = opt.CtxRepo.Git2Go
 		return
 	}
@@ -51,6 +56,11 @@ func (opt *Options) OpenGit2GoRepo() (repo *gitgo.Repository, err error) {
 	repo, err = gitgo.OpenRepository(opt.WorkDir)
 	if err != nil {
 		return nil, err
+	}
+
+	if opt.CtxRepo != nil {
+		opt.CtxRepo.Git2Go = repo
+		return
 	}
 
 	opt.WithRepo(&Repository{Git2Go: repo})

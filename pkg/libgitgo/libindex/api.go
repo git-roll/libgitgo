@@ -4,6 +4,10 @@ import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 )
 
+func AddAll(opt *types.Options) (err error) {
+    return with(opt).Add([]string{"."})
+}
+
 func Add(paths []string, opt *types.Options) (err error) {
     return with(opt).Add(paths)
 }

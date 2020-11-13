@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libindex"
 	"github.com/git-roll/libgitgo/pkg/utils"
 
-	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 )
 
@@ -33,20 +33,7 @@ var addCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
-		utils.DieIf(err)
-
-		index, err := repo.Index()
-		utils.DieIf(err)
-
-		err = index.AddAll(args, git.IndexAddDefault, func(path string, _ string) int {
-			fmt.Printf("%s added\n", path)
-			return 0
-		})
-
-		utils.DieIf(err)
-
-		err = index.Write()
+		err := libindex.Add(args, options())
 		utils.DieIf(err)
 		fmt.Println("Index Updated")
 	},

@@ -14,10 +14,12 @@ type wrapper interface {
 
 func with(opt *types.Options) wrapper {
     switch opt.PreferredLib {
-    case types.PreferGoGit:
-        return &goGit{opt}
     case types.PreferGit2Go:
         panic("git2go doesn't support reading configurations")
+    case types.PreferGoGit:
+        fallthrough
+    default:
+        return &goGit{opt}
     }
 
     return nil

@@ -8,7 +8,7 @@ if [ -z $1 ]; then
 fi
 
 echo -n "🐳 Creating directory for the lib..."
-mkdir -p "pkg/libgitgo/$1"
+mkdir -p "pkg/libgitgo/lib$1"
 echo "Done"
 
 ObjectExp="err"
@@ -52,7 +52,7 @@ fi
 
 echo -n "🐳 Generating interfaces..."
 cat > "pkg/libgitgo/lib$1/api.go" <<EOF
-package $1
+package lib$1
 
 import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"
@@ -69,9 +69,9 @@ type wrapper interface {
 func with(opt *types.Options) wrapper {
     switch opt.PreferredLib {
     case types.PreferGoGit:
-        return &goGit{workdir: opt.WorkDir}
+        return &goGit{opt}
     case types.PreferGit2Go:
-        return &git2go{workdir: opt.WorkDir}
+        return &git2go{opt}
     }
 
     return nil
@@ -81,7 +81,7 @@ echo "Done"
 
 echo -n "🐳 Generating implementation for git2go..."
 cat > "pkg/libgitgo/lib$1/git2go.go" <<EOF
-package $1
+package lib$1
 
 import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
@@ -89,7 +89,7 @@ import (
 )
 
 type git2go struct {
-	workdir string
+	*types.Options
 }
 
 func (g git2go) Open() (${ObjectExp} error) {
@@ -100,7 +100,7 @@ echo "Done"
 
 echo -n "🐳 Generating implementation for go-git..."
 cat > "pkg/libgitgo/lib$1/gogit.go" <<EOF
-package $1
+package lib$1
 
 import (
   "github.com/git-roll/libgitgo/pkg/libgitgo/types"
@@ -108,7 +108,7 @@ import (
 )
 
 type goGit struct {
-  workdir string
+  *types.Options
 }
 
 func (g goGit) Open() (${ObjectExp} error) {

@@ -17,10 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libcommit"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libconfig"
 	"github.com/git-roll/libgitgo/pkg/utils"
 	"os"
 
-	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 )
 
@@ -38,72 +39,17 @@ var commitCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
+		opt := options()
+		user, err := libconfig.User(opt)
 		utils.DieIf(err)
 
-		statusList, err := repo.StatusList(&git.StatusOptions{})
+		_, err = libcommit.CommitStaging(message, &libcommit.CommitOptions{
+			All:       false,
+			Author:    user,
+			Committer: user,
+		}, opt)
+
 		utils.DieIf(err)
-
-		statusCount, err := statusList.EntryCount()
-		utils.DieIf(err)
-
-		if statusCount == 0 {
-			fmt.Println("Nothing changed")
-			return
-		}
-
-		index, err := repo.Index()
-		utils.DieIf(err)
-
-		var modified, deleted, added []string
-		for i := 0; i < statusCount; i++ {
-			entry, err := statusList.ByIndex(i)
-			utils.DieIf(err)
-			switch entry.Status {
-			case git.StatusWtModified, git.StatusWtTypeChange:
-				fmt.Println("index updated:", entry.HeadToIndex.NewFile.Path)
-				modified = append(modified, entry.HeadToIndex.NewFile.Path)
-			case git.StatusWtDeleted:
-				fmt.Println("index deleted:", entry.HeadToIndex.OldFile.Path)
-				deleted = append(deleted, entry.HeadToIndex.OldFile.Path)
-			case git.StatusWtRenamed:
-				fmt.Println("index renamed:", entry.HeadToIndex.NewFile.Path)
-				added = append(added, entry.HeadToIndex.NewFile.Path)
-				deleted = append(deleted, entry.HeadToIndex.OldFile.Path)
-			}
-		}
-
-		if len(modified) > 0 {
-			err = index.UpdateAll(modified, nil)
-			utils.DieIf(err)
-		}
-
-		if len(deleted) > 0 {
-			err = index.RemoveAll(deleted, nil)
-			utils.DieIf(err)
-		}
-
-		if len(added) > 0 {
-			err = index.AddAll(added, git.IndexAddDefault, nil)
-
-			utils.DieIf(err)
-		}
-
-		treeOid, err := index.WriteTree()
-		utils.DieIf(err)
-
-		err = index.Write()
-		utils.DieIf(err)
-
-		sig, err := repo.DefaultSignature()
-		utils.DieIf(err)
-
-		head, err := repo.Head()
-		utils.DieIf(err)
-
-		_, err = repo.CreateCommitFromIds("HEAD", sig, sig, message, treeOid, head.Target())
-		utils.DieIf(err)
-
 		fmt.Println("Committed")
 	},
 }

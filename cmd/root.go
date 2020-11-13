@@ -67,6 +67,7 @@ func options(recommendedLib ...types.PreferredLib) *types.Options {
 
 func optionsWith(workdir string, recommendedLib ...types.PreferredLib) *types.Options {
 	opt := &types.Options{
+		FollowOpenedRepo: true,
 		Progress: os.Stdout,
 		WorkDir: workdir,
 		Auth: types.Auth{

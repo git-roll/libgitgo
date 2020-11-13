@@ -1,9 +1,16 @@
 package types
 
 import (
+	"fmt"
 	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	gitgo "github.com/libgit2/git2go/v31"
+	sshCli "golang.org/x/crypto/ssh"
 	"io"
+	"os"
+	"path/filepath"
 )
 
 type Options struct {
@@ -72,4 +79,79 @@ type Auth struct {
 	Password   string
 	SSHId      string
 	Passphrase string
+}
+
+func (a Auth) GenGoGitAuth(url string) (transport.AuthMethod, error) {
+	ep, err := transport.NewEndpoint(url)
+	if err != nil {
+		return nil, err
+	}
+
+	switch ep.Protocol {
+	case "ssh":
+		if len(ep.User) > 0 && len(ep.Password) > 0 {
+			return &ssh.Password{
+				User:                  ep.User,
+				Password:              ep.Password,
+				HostKeyCallbackHelper: ssh.HostKeyCallbackHelper{HostKeyCallback: sshCli.InsecureIgnoreHostKey()},
+			}, nil
+		} else if len(a.User) > 0 {
+			return &ssh.Password{
+				User:                  a.User,
+				Password:              a.Password,
+				HostKeyCallbackHelper: ssh.HostKeyCallbackHelper{HostKeyCallback: sshCli.InsecureIgnoreHostKey()},
+			}, nil
+		} else if len(a.SSHId) > 0 {
+			if a.SSHId[0] == '~' {
+				home, err := os.UserHomeDir()
+				if err != nil {
+					return nil, err
+				}
+
+				a.SSHId = filepath.Join(home, a.SSHId[1:])
+			}
+
+			return ssh.NewPublicKeysFromFile(ssh.DefaultUsername, a.SSHId, a.Passphrase)
+		}
+	case "file", "http", "https":
+		if len(ep.User) > 0 && len(ep.Password) > 0 {
+			return &http.BasicAuth{
+				Username: ep.User,
+				Password: ep.Password,
+			}, nil
+		}
+	default:
+		return nil, fmt.Errorf("unsupported protocol %s", ep.Protocol)
+	}
+
+	return nil, nil
+}
+
+func (a Auth) GenGit2GoAuth(url string, username string, allowedTypes gitgo.CredType) (*gitgo.Cred, error) {
+	if (allowedTypes & gitgo.CredTypeUserpassPlaintext) > 0 {
+		if len(username) > 0 && username != a.User {
+			return nil, fmt.Errorf("username not matched")
+		}
+
+		return gitgo.NewCredUserpassPlaintext(a.User, a.Password)
+	}
+
+	if (allowedTypes & gitgo.CredTypeSshKey) > 0 {
+		if a.SSHId[0] == '~' {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return nil, err
+			}
+
+			a.SSHId = filepath.Join(home, a.SSHId[1:])
+		}
+
+		return gitgo.NewCredSshKey(username, a.SSHId+".pub", a.SSHId, a.Passphrase)
+	}
+
+	if (allowedTypes & gitgo.CredTypeDefault) > 0 {
+		return gitgo.NewCredDefault()
+	}
+
+	return nil, nil
 }

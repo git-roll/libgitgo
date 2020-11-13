@@ -88,9 +88,6 @@ func optionsWith(workdir string, recommendedLib ...types.PreferredLib) *types.Op
 			opt.PreferredLib = recommendedLib[0]
 			break
 		}
-
-		fmt.Fprintln(os.Stderr, "uses --lib=git2go or --lib=go-git")
-		os.Exit(2)
 	}
 
 	return opt

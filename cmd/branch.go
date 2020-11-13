@@ -21,6 +21,7 @@ import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/libbranch"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/git-roll/libgitgo/pkg/utils"
+	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 )
 
@@ -64,7 +65,7 @@ var branchCmd = &cobra.Command{
 
 		if !create {
 			brs, err := libbranch.List(
-				&libbranch.ListOption{libbranch.Git2GoListOption{Type: git2go.Get(parameterKeyType) }},
+				&libbranch.ListOption{libbranch.Git2GoListOption{Type: getBranchType(git2go.Get(parameterKeyType)) }},
 				options(types.PreferGit2Go))
 			utils.DieIf(err)
 			for _, br := range brs {
@@ -89,6 +90,21 @@ var branchCmd = &cobra.Command{
 		utils.DieIf(err)
 		fmt.Println("Created")
 	},
+}
+
+func getBranchType(brType string) git.BranchType {
+	switch brType {
+	case "BranchLocal":
+		return git.BranchLocal
+	case "BranchRemote":
+		return git.BranchRemote
+	case "BranchAll", "":
+		return git.BranchAll
+	default:
+		utils.DieIf(fmt.Errorf(`BranchType could be one of "BranchLocal", "BranchRemote", or "BranchAll"`))
+	}
+
+	panic(brType)
 }
 
 func init() {

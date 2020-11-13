@@ -8,10 +8,16 @@ func Get(ref string, opt *types.Options) (*types.Commit, error) {
 	return with(opt).Get(ref)
 }
 
+type Git2GoCommitOptions struct {
+	RefName string
+	Parent  string
+}
+
 type CommitOptions struct {
 	All       bool
 	Author    *types.User
 	Committer *types.User
+	Git2Go    Git2GoCommitOptions
 }
 
 func CommitStaging(message string, commitOpt *CommitOptions, opt *types.Options) (*types.Commit, error) {

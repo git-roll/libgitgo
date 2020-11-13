@@ -83,14 +83,19 @@ func (g git2go) CommitStaging(message string, opt *CommitOptions) (commit *types
 		return
 	}
 
-	head, err := repo.Head()
-	if err != nil {
-		return
+	var parent *git.Reference
+	if len(opt.Git2Go.Parent) > 0 {
+		if parent, err = repo.References.Lookup(opt.Git2Go.Parent); err != nil {
+			return
+		}
+	} else {
+		if parent, err = repo.Head(); err != nil {
+			return
+		}
 	}
 
 	now := time.Now()
-
-	oid, err := repo.CreateCommitFromIds("", &git.Signature{
+	oid, err := repo.CreateCommitFromIds(opt.Git2Go.RefName, &git.Signature{
 		Name:  opt.Author.Name,
 		Email: opt.Author.Email,
 		When:  now,
@@ -98,7 +103,7 @@ func (g git2go) CommitStaging(message string, opt *CommitOptions) (commit *types
 		Name:  opt.Author.Name,
 		Email: opt.Author.Email,
 		When:  now,
-	}, message, treeOid, head.Target())
+	}, message, treeOid, parent.Target())
 	if err != nil {
 		return
 	}

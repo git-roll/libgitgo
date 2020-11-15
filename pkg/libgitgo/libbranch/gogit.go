@@ -1,14 +1,45 @@
 package libbranch
 
 import (
+  "fmt"
   "github.com/git-roll/libgitgo/pkg/libgitgo/types"
   "github.com/go-git/go-git/v5"
   "github.com/go-git/go-git/v5/config"
   "github.com/go-git/go-git/v5/plumbing"
+  "strings"
 )
 
 type goGit struct {
   *types.Options
+}
+
+func (g goGit) Checkout(name string) error {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return err
+  }
+
+  wt, err := repo.Worktree()
+  if err != nil {
+    return err
+  }
+
+  branchRef := plumbing.NewBranchReferenceName(name)
+  _, err = repo.Reference(branchRef, false)
+  if err != nil {
+    remoteBr := strings.Split(name, "/")
+    if len(remoteBr) != 2 {
+      return fmt.Errorf("invalid branch %s", name)
+    }
+
+    branchRef = plumbing.NewRemoteReferenceName(remoteBr[0], remoteBr[1])
+  }
+
+  err = wt.Checkout(&git.CheckoutOptions{
+    Branch: branchRef,
+  })
+
+  return err
 }
 
 func (g goGit) Create(name string, createOpt *CreateOption) (br *types.Branch, err error) {

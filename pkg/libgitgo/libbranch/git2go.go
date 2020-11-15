@@ -9,6 +9,43 @@ type git2go struct {
 	*types.Options
 }
 
+func (g git2go) Checkout(name string) error {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return err
+	}
+
+	br, err := repo.LookupBranch(name, git.BranchAll)
+	if err != nil {
+		return err
+	}
+
+	commit, err := repo.LookupCommit(br.Target())
+	if err != nil {
+		return err
+	}
+
+	tree, err := commit.Tree()
+	if err != nil {
+		return err
+	}
+
+	err = repo.CheckoutTree(tree, &git.CheckoutOpts{
+		Strategy:         git.CheckoutSafe | git.CheckoutRecreateMissing,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	ref, err := repo.References.Dwim(name)
+	if err != nil {
+		return err
+	}
+
+	return repo.SetHead(ref.Name())
+}
+
 func (g git2go) Create(name string, createOpt *CreateOption) (*types.Branch, error) {
 	opt := createOpt.Git2Go
 	repo, err := g.OpenGit2GoRepo()

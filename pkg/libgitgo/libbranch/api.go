@@ -46,9 +46,14 @@ func Create(name string, createOpt *CreateOption, opt *types.Options) (*types.Br
 	return with(opt).Create(name, createOpt)
 }
 
+func Checkout(name string, opt *types.Options) error {
+	return with(opt).Checkout(name)
+}
+
 type wrapper interface {
 	List(*ListOption) ([]*types.Branch, error)
 	Create(name string, createOpt *CreateOption) (*types.Branch, error)
+	Checkout(name string) error
 }
 
 func with(opt *types.Options) wrapper {

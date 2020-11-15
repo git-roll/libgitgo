@@ -7,16 +7,16 @@ import (
 	gitgo "github.com/libgit2/git2go/v31"
 )
 
-type Option struct {
-	Git2Go Git2GoOption
-	GoGit  GoGitOption
+type Options struct {
+	Git2Go Git2GoOptions
+	GoGit  GoGitOptions
 }
 
-type Git2GoOption struct {
+type Git2GoOptions struct {
 	gitgo.DownloadTags
 }
 
-type GoGitOption struct {
+type GoGitOptions struct {
 	// usually `origin`
 	RemoteName string
 	// specified branch only
@@ -27,7 +27,7 @@ type GoGitOption struct {
 	gogit.TagMode
 }
 
-func Start(url string, branch string, bare bool, cloneOpt *Option, opt *types.Options) (*types.Repository, error) {
+func Start(url string, branch string, bare bool, cloneOpt *Options, opt *types.Options) (*types.Repository, error) {
 	repo, err := with(opt).Start(url, branch, bare, cloneOpt)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func Start(url string, branch string, bare bool, cloneOpt *Option, opt *types.Op
 }
 
 type wrapper interface {
-	Start(url string, branch string, bare bool, cloneOpt *Option) (*types.Repository, error)
+	Start(url string, branch string, bare bool, cloneOpt *Options) (*types.Repository, error)
 }
 
 func with(opt *types.Options) wrapper {

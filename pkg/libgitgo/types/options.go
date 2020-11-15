@@ -9,8 +9,6 @@ import (
 	gitgo "github.com/libgit2/git2go/v31"
 	sshCli "golang.org/x/crypto/ssh"
 	"io"
-	"os"
-	"path/filepath"
 )
 
 type Options struct {
@@ -102,15 +100,6 @@ func (a Auth) GenGoGitAuth(url string) (transport.AuthMethod, error) {
 				HostKeyCallbackHelper: ssh.HostKeyCallbackHelper{HostKeyCallback: sshCli.InsecureIgnoreHostKey()},
 			}, nil
 		} else if len(a.SSHId) > 0 {
-			if a.SSHId[0] == '~' {
-				home, err := os.UserHomeDir()
-				if err != nil {
-					return nil, err
-				}
-
-				a.SSHId = filepath.Join(home, a.SSHId[1:])
-			}
-
 			return ssh.NewPublicKeysFromFile(ssh.DefaultUsername, a.SSHId, a.Passphrase)
 		}
 	case "file", "http", "https":
@@ -137,15 +126,6 @@ func (a Auth) GenGit2GoAuth(url string, username string, allowedTypes gitgo.Cred
 	}
 
 	if (allowedTypes & gitgo.CredTypeSshKey) > 0 {
-		if a.SSHId[0] == '~' {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return nil, err
-			}
-
-			a.SSHId = filepath.Join(home, a.SSHId[1:])
-		}
-
 		return gitgo.NewCredSshKey(username, a.SSHId+".pub", a.SSHId, a.Passphrase)
 	}
 

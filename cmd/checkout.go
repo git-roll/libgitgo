@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libbranch"
 	"github.com/git-roll/libgitgo/pkg/utils"
-	git "github.com/libgit2/git2go/v31"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -33,53 +33,7 @@ var checkoutCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
-		utils.DieIf(err)
-
-		br, err := repo.LookupBranch(args[0], git.BranchAll)
-		utils.DieIf(err)
-
-		commit, err := repo.LookupCommit(br.Target())
-		utils.DieIf(err)
-
-		tree, err := commit.Tree()
-		utils.DieIf(err)
-
-		err = repo.CheckoutTree(tree, &git.CheckoutOpts{
-			Strategy:         git.CheckoutSafe | git.CheckoutRecreateMissing ,
-			NotifyFlags:      git.CheckoutNotifyAll,
-			NotifyCallback:   func(why git.CheckoutNotifyType, path string, baseline, target, workdir git.DiffFile) git.ErrorCode{
-				reason := ""
-				switch why {
-				case git.CheckoutNotifyNone:
-					reason = "CheckoutNotifyNone"
-				case git.CheckoutNotifyConflict:
-					reason = "CheckoutNotifyConflict"
-				case git.CheckoutNotifyDirty:
-					reason = "CheckoutNotifyDirty"
-				case git.CheckoutNotifyUpdated:
-					reason = "CheckoutNotifyUpdated"
-				case git.CheckoutNotifyUntracked:
-					reason = "CheckoutNotifyUntracked"
-				case git.CheckoutNotifyIgnored:
-					reason = "CheckoutNotifyIgnored"
-				case git.CheckoutNotifyAll:
-					reason = "CheckoutNotifyAll"
-				}
-				fmt.Println("notification on ", path, "because", reason)
-				return git.ErrOk
-			},
-			ProgressCallback: func(path string, completed, total uint) git.ErrorCode{
-				fmt.Println(path, "completed:", completed, "/total:", total)
-				return git.ErrOk
-			},
-		})
-
-		utils.DieIf(err)
-		ref, err := repo.References.Dwim(args[0])
-		utils.DieIf(err)
-
-		err = repo.SetHead(ref.Name())
+		err := libbranch.Checkout(args[0], options())
 		utils.DieIf(err)
 	},
 }

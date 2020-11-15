@@ -1,6 +1,7 @@
 package libpush
 
 import (
+	"bytes"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/git-roll/libgitgo/pkg/refspec"
 	git "github.com/libgit2/git2go/v31"
@@ -10,15 +11,15 @@ type git2go struct {
 	*types.Options
 }
 
-func (g git2go) Start(branches []string, remoteName string, force bool) (err error) {
+func (g git2go) Start(branches []string, remoteName string, force bool) (remoteOut string, err error) {
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
-		return err
+		return
 	}
 
 	remote, err := repo.Remotes.Lookup(remoteName)
 	if err != nil {
-		return err
+		return
 	}
 
 	var refSpecs []string
@@ -32,7 +33,7 @@ func (g git2go) Start(branches []string, remoteName string, force bool) (err err
 			}
 
 			if refSpecs, err = remote.PushRefspecs(); err != nil {
-				return err
+				return
 			}
 
 			if len(refSpecs) > 0 {
@@ -41,25 +42,24 @@ func (g git2go) Start(branches []string, remoteName string, force bool) (err err
 
 			head, err := repo.Head()
 			if err != nil {
-				return err
+				return "", err
 			}
 
 			br, err = head.Branch().Name()
 			if err != nil {
-				return err
+				return "", err
 			}
 
 			refSpecs = []string{refspec.PushBranch(br)}
 		}
 	}
 
-	return remote.Push(refSpecs, &git.PushOptions{
+	out := &bytes.Buffer{}
+
+	err = remote.Push(refSpecs, &git.PushOptions{
 		RemoteCallbacks: git.RemoteCallbacks{
 			SidebandProgressCallback:     func(str string) git.ErrorCode{
-				if g.Progress != nil {
-					g.Progress.Write([]byte(str))
-				}
-
+				out.WriteString(str)
 				return git.ErrOk
 			},
 			CompletionCallback:           func(git.RemoteCompletion) git.ErrorCode{
@@ -86,4 +86,6 @@ func (g git2go) Start(branches []string, remoteName string, force bool) (err err
 			},
 		},
 	})
+
+	return out.String(), nil
 }

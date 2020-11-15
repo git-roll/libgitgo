@@ -66,6 +66,9 @@ func options(recommendedLib ...types.PreferredLib) *types.Options {
 }
 
 func optionsWith(workdir string, recommendedLib ...types.PreferredLib) *types.Options {
+	sshID, err := utils.ResolveHomePath(authSSHIdFile)
+	utils.DieIf(err)
+
 	opt := &types.Options{
 		FollowOpenedRepo: true,
 		Progress: os.Stdout,
@@ -73,7 +76,7 @@ func optionsWith(workdir string, recommendedLib ...types.PreferredLib) *types.Op
 		Auth: types.Auth{
 			User:       authUser,
 			Password:   authPassword,
-			SSHId:      authSSHIdFile,
+			SSHId:      sshID,
 			Passphrase: authSSHPassphrase,
 		},
 	}

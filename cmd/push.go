@@ -38,20 +38,21 @@ var pushCmd = &cobra.Command{
 			return
 		}
 
+		var out string
+		var err error
 		if len(args) > 1 {
-			err := libpush.Branch(args[1], args[0], forcePush, options())
-			utils.DieIf(err)
+			out, err = libpush.Branch(args[1], args[0], forcePush, options())
 		} else {
 			if pushAll {
-				err := libpush.AllBranches(args[0], forcePush, options())
-				utils.DieIf(err)
+				out, err = libpush.AllBranches(args[0], forcePush, options())
 			} else {
-				err := libpush.CurBranch(args[0], true, options())
-				utils.DieIf(err)
+				out, err = libpush.CurBranch(args[0], true, options())
+
 			}
 		}
 
-		fmt.Println(args[0], "Pushed")
+		utils.DieIf(err)
+		fmt.Println(out)
 	},
 }
 

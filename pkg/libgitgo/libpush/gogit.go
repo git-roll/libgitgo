@@ -1,6 +1,7 @@
 package libpush
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	"github.com/git-roll/libgitgo/pkg/refspec"
@@ -12,7 +13,7 @@ type goGit struct {
 	*types.Options
 }
 
-func (g goGit) Start(branches []string, remoteName string, force bool) (err error) {
+func (g goGit) Start(branches []string, remoteName string, force bool) (remoteOut string, err error) {
 	repo, err := g.Options.OpenGoGitRepo()
 	if err != nil {
 		return
@@ -30,7 +31,7 @@ func (g goGit) Start(branches []string, remoteName string, force bool) (err erro
 
 	auth, err := g.Options.Auth.GenGoGitAuth(url)
 	if err != nil {
-		return err
+		return
 	}
 
 	var refSpecs []config.RefSpec
@@ -45,22 +46,31 @@ func (g goGit) Start(branches []string, remoteName string, force bool) (err erro
 
 			head, err := repo.Head()
 			if err != nil {
-				return err
+				return "", err
 			}
 
 			if !head.Name().IsBranch() {
-				return fmt.Errorf("the current head is not a branch: %s", head.Name().Short())
+				return "", fmt.Errorf("the current head is not a branch: %s", head.Name().Short())
 			}
 
 			refSpecs = append(refSpecs, config.RefSpec(refspec.PushBranch(head.Name().Short())))
 		}
 	}
 
-	return repo.Push(&git.PushOptions{
+	out := &bytes.Buffer{}
+	opt := &git.PushOptions{
 		RemoteName: remoteName,
 		RefSpecs:   refSpecs,
 		Auth:       auth,
-		Progress:   g.Options.Progress,
+		Progress:   out,
 		Force:      force,
-	})
+	}
+
+	if g.Options.Context != nil {
+		err = repo.PushContext(g.Options.Context, opt)
+	} else {
+		err = repo.Push(opt)
+	}
+
+	return out.String(), err
 }

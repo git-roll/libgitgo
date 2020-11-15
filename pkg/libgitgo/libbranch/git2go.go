@@ -1,7 +1,6 @@
 package libbranch
 
 import (
-	"fmt"
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	git "github.com/libgit2/git2go/v31"
 )
@@ -51,19 +50,7 @@ func (g git2go) List(opt *ListOption) (brs []*types.Branch, err error) {
 		return nil, err
 	}
 
-	var brType git.BranchType
-	switch opt.Git2Go.Type {
-	case "BranchLocal":
-		brType = git.BranchLocal
-	case "BranchRemote":
-		brType = git.BranchRemote
-	case "BranchAll", "":
-		brType = git.BranchAll
-	default:
-		return nil, fmt.Errorf(`BranchType could be one of "BranchLocal", "BranchRemote", or "BranchAll"`)
-	}
-
-	it, err := repo.NewBranchIterator(brType)
+	it, err := repo.NewBranchIterator(opt.Git2Go.Type)
 	if err != nil {
 		return nil, err
 	}

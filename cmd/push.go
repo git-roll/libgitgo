@@ -17,15 +17,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/git-roll/libgitgo/pkg/refspec"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libpush"
 	"github.com/git-roll/libgitgo/pkg/utils"
-	remoteGit "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
-	"os"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
+	"os"
+)
+
+var (
+	pushAll = false
+	forcePush = false
 )
 
 // pushCmd represents the push command
@@ -38,36 +38,25 @@ var pushCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := remoteGit.PlainOpen(utils.GetPwdOrDie())
-		utils.DieIf(err)
-
-		var refs []config.RefSpec
 		if len(args) > 1 {
-			refSpec := refspec.PushBranch(args[0], args[1])
-			err = refSpec.Validate()
+			err := libpush.Branch(args[1], args[0], forcePush, options())
 			utils.DieIf(err)
-			fmt.Println(refSpec.String())
-			refs = []config.RefSpec{refSpec}
+		} else {
+			if pushAll {
+				err := libpush.AllBranches(args[0], forcePush, options())
+				utils.DieIf(err)
+			} else {
+				err := libpush.CurBranch(args[0], true, options())
+				utils.DieIf(err)
+			}
 		}
 
-		home, err := os.UserHomeDir()
-		utils.DieIf(err)
-		auth, err := ssh.NewPublicKeysFromFile(ssh.DefaultUsername, filepath.Join(home, "Documents/keys/client-test"), "")
-		utils.DieIf(err)
-
-		err = repo.Push(&remoteGit.PushOptions{
-			RemoteName: args[0],
-			RefSpecs:   refs,
-			Auth:       auth,
-			Progress:   os.Stdout,
-			Force:      true,
-		})
-
-		utils.DieIf(err)
 		fmt.Println(args[0], "Pushed")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(pushCmd)
+	pushCmd.Flags().BoolVar(&pushAll, "all", pushAll, "Push all local branches")
+	pushCmd.Flags().BoolVar(&forcePush, "force", forcePush, "Overwrite the existed remote branch")
 }

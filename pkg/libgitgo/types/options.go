@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport"
@@ -20,6 +21,7 @@ type Options struct {
 	// Opened Repository will be saved in the Options if enabled
 	FollowOpenedRepo bool
 	CtxRepo          *Repository
+	Context context.Context
 }
 
 func (opt *Options) WithRepo(repo *Repository) {
@@ -70,6 +72,12 @@ func (opt *Options) OpenGit2GoRepo() (repo *gitgo.Repository, err error) {
 
 	opt.WithRepo(&Repository{Git2Go: repo})
 	return
+}
+
+func (opt *Options) WithContext(ctx context.Context) *Options {
+	newOpt := *opt
+	newOpt.Context = ctx
+	return &newOpt
 }
 
 type Auth struct {

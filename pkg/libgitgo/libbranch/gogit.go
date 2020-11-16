@@ -6,11 +6,45 @@ import (
   "github.com/go-git/go-git/v5"
   "github.com/go-git/go-git/v5/config"
   "github.com/go-git/go-git/v5/plumbing"
+  "golang.org/x/xerrors"
   "strings"
 )
 
 type goGit struct {
   *types.Options
+}
+
+func (g goGit) Current() (br *types.Branch, err error) {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return
+  }
+
+  head, err := repo.Head()
+  if err != nil {
+    return
+  }
+
+  if !head.Name().IsBranch() {
+    return nil, xerrors.Errorf("HEAD is not a branch")
+  }
+
+  branch, err := repo.Branch(head.Name().Short())
+  if err != nil {
+    return
+  }
+
+  br = &types.Branch{GoGit: branch}
+  return
+}
+
+func (g goGit) Delete(name string) error {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return err
+  }
+
+  return repo.DeleteBranch(name)
 }
 
 func (g goGit) Checkout(name string) error {

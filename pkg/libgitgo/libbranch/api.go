@@ -50,19 +50,29 @@ func Checkout(name string, opt *types.Options) error {
 	return with(opt).Checkout(name)
 }
 
+func Current(opt *types.Options) (*types.Branch, error) {
+	return with(opt).Current()
+}
+
+func Delete(name string, opt *types.Options) error {
+	return with(opt).Delete(name)
+}
+
 type wrapper interface {
 	List(*ListOption) ([]*types.Branch, error)
 	Create(name string, createOpt *CreateOption) (*types.Branch, error)
 	Checkout(name string) error
+	Current() (*types.Branch, error)
+	Delete(name string) error
 }
 
 func with(opt *types.Options) wrapper {
 	switch opt.PreferredLib {
-	case types.PreferGit2Go:
-		return &git2go{opt}
 	case types.PreferGoGit:
+		return &goGit{opt}
+	case types.PreferGit2Go:
 		fallthrough
 	default:
-		return &goGit{opt}
+		return &git2go{opt}
 	}
 }

@@ -3,10 +3,44 @@ package libbranch
 import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	git "github.com/libgit2/git2go/v31"
+	"golang.org/x/xerrors"
 )
 
 type git2go struct {
 	*types.Options
+}
+
+func (g git2go) Current() (br *types.Branch, err error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return
+	}
+
+	head, err := repo.Head()
+	if err != nil {
+		return
+	}
+
+	if !head.IsBranch() {
+		return nil, xerrors.Errorf("HEAD is not a branch")
+	}
+
+	br = &types.Branch{Git2Go: head.Branch()}
+	return
+}
+
+func (g git2go) Delete(name string) error {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return err
+	}
+
+	br, err := repo.LookupBranch(name, git.BranchLocal)
+	if err != nil {
+		return err
+	}
+
+	return br.Delete()
 }
 
 func (g git2go) Checkout(name string) error {

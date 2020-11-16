@@ -5,11 +5,16 @@ import (
   "github.com/go-git/go-git/v5"
   "github.com/go-git/go-git/v5/plumbing"
   "github.com/go-git/go-git/v5/plumbing/object"
+  "golang.org/x/xerrors"
   "time"
 )
 
 type goGit struct {
   *types.Options
+}
+
+func (g goGit) Amend(_ string, _ *CommitOptions) (*types.Commit, error) {
+  return nil, xerrors.Errorf("go-git doesn't support commit amending")
 }
 
 func (g goGit) CommitStaging(message string, opt *CommitOptions) (commit *types.Commit, err error) {
@@ -18,13 +23,13 @@ func (g goGit) CommitStaging(message string, opt *CommitOptions) (commit *types.
     return
   }
 
-  tree, err := repo.Worktree()
+  wt, err := repo.Worktree()
   if err != nil {
     return
   }
 
   now := time.Now()
-  hash, err := tree.Commit(message, &git.CommitOptions{
+  hash, err := wt.Commit(message, &git.CommitOptions{
     All:       opt.All,
     Author:    &object.Signature{
       Name:  opt.Author.Name,

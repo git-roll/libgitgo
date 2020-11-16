@@ -24,9 +24,14 @@ func CommitStaging(message string, commitOpt *CommitOptions, opt *types.Options)
 	return with(opt).CommitStaging(message, commitOpt)
 }
 
+func Amend(message string, commitOpt *CommitOptions, opt *types.Options) (*types.Commit, error) {
+	return with(opt).Amend(message, commitOpt)
+}
+
 type wrapper interface {
 	Get(ref string) (*types.Commit, error)
 	CommitStaging(message string, commitOpt *CommitOptions) (*types.Commit, error)
+	Amend(message string, commitOpt *CommitOptions) (*types.Commit, error)
 }
 
 func with(opt *types.Options) wrapper {

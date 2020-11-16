@@ -29,18 +29,25 @@ func (g git2go) Current() (br *types.Branch, err error) {
 	return
 }
 
-func (g git2go) Delete(name string) error {
+func (g git2go) DeleteAll(brs []string) error {
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return err
 	}
 
-	br, err := repo.LookupBranch(name, git.BranchLocal)
-	if err != nil {
-		return err
+	for _, br := range brs {
+		branch, err := repo.LookupBranch(br, git.BranchLocal)
+		if err != nil {
+			return err
+		}
+
+		if err = branch.Delete(); err != nil {
+			return err
+		}
 	}
 
-	return br.Delete()
+
+	return nil
 }
 
 func (g git2go) Checkout(name string) error {

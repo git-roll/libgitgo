@@ -38,13 +38,19 @@ func (g goGit) Current() (br *types.Branch, err error) {
   return
 }
 
-func (g goGit) Delete(name string) error {
+func (g goGit) DeleteAll(brs []string) error {
   repo, err := g.Options.OpenGoGitRepo()
   if err != nil {
     return err
   }
 
-  return repo.DeleteBranch(name)
+  for _, br := range brs {
+    if err := repo.DeleteBranch(br); err != nil {
+      return err
+    }
+  }
+
+  return nil
 }
 
 func (g goGit) Checkout(name string) error {

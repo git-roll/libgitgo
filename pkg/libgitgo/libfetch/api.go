@@ -4,6 +4,11 @@ import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	gogit "github.com/go-git/go-git/v5"
 	gitgo "github.com/libgit2/git2go/v31"
+	"golang.org/x/xerrors"
+)
+
+var (
+	ErrUpToDate = xerrors.Errorf("up-to-date")
 )
 
 type Options struct {

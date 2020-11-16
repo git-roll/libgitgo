@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/go-git/go-git/v5 v5.2.0
-	github.com/libgit2/git2go/v31 v31.0.0
+	github.com/libgit2/git2go/v31 v31.3.2
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0

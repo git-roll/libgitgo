@@ -61,6 +61,42 @@ func (g git2go) Checkout(name string) error {
 		return err
 	}
 
+	return g.checkoutBranch(repo, br)
+}
+
+func (g git2go) CheckoutNew(name string) (*types.Branch, error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return nil, err
+	}
+
+	br, err := g.createBranch(repo, name, &Git2GoCreateOption{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = g.checkoutBranch(repo, br)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.Branch{Git2Go: br}, nil
+}
+
+func (g git2go) Create(name string, createOpt *CreateOption) (*types.Branch, error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return nil, err
+	}
+
+	br, err := g.createBranch(repo, name, &createOpt.Git2Go)
+	if err != nil {
+		return nil, err
+	}
+	return &types.Branch{Git2Go: br}, nil
+}
+
+func (g git2go) checkoutBranch(repo *git.Repository, br *git.Branch) error {
 	commit, err := repo.LookupCommit(br.Target())
 	if err != nil {
 		return err
@@ -79,21 +115,15 @@ func (g git2go) Checkout(name string) error {
 		return err
 	}
 
-	ref, err := repo.References.Dwim(name)
+	brName, err := br.Name()
 	if err != nil {
 		return err
 	}
 
-	return repo.SetHead(ref.Name())
+	return repo.SetHead(brName)
 }
 
-func (g git2go) Create(name string, createOpt *CreateOption) (*types.Branch, error) {
-	opt := createOpt.Git2Go
-	repo, err := g.OpenGit2GoRepo()
-	if err != nil {
-		return nil, err
-	}
-
+func (g git2go) createBranch(repo *git.Repository, name string, opt *Git2GoCreateOption) (*git.Branch, error) {
 	commitOid, err := git.NewOid(opt.Target)
 	if err != nil {
 		target, err := repo.References.Lookup(opt.Target)
@@ -114,12 +144,7 @@ func (g git2go) Create(name string, createOpt *CreateOption) (*types.Branch, err
 		return nil, err
 	}
 
-	br, err := repo.CreateBranch(name, targetCommit, opt.Force)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.Branch{Git2Go: br}, nil
+	return repo.CreateBranch(name, targetCommit, opt.Force)
 }
 
 func (g git2go) List(opt *ListOption) (brs []*types.Branch, err error) {

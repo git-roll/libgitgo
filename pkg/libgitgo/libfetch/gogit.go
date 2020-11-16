@@ -54,7 +54,7 @@ func (g goGit) Start(branch, remoteName string, fetchOpt *Options) (err error) {
 	})
 
 	if err == git.NoErrAlreadyUpToDate {
-		err = nil
+		err = ErrUpToDate
 	}
 
 	return

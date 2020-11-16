@@ -60,13 +60,19 @@ var fetchCmd = &cobra.Command{
 			},
 		}
 
+		var err error
 		if len(args) > 1 {
-			err := libfetch.Branch(args[1], args[0], opts, options())
-			utils.DieIf(err)
+			err = libfetch.Branch(args[1], args[0], opts, options())
 		} else {
-			err := libfetch.Remote(args[0], opts, options())
-			utils.DieIf(err)
+			err = libfetch.Remote(args[0], opts, options())
 		}
+
+		if err == libfetch.ErrUpToDate {
+			fmt.Println(err.Error())
+			return
+		}
+
+		utils.DieIf(err)
 	},
 }
 

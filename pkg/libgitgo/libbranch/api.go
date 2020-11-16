@@ -50,6 +50,10 @@ func Checkout(name string, opt *types.Options) error {
 	return with(opt).Checkout(name)
 }
 
+func CheckoutNew(name string, opt *types.Options) (*types.Branch, error) {
+	return with(opt).CheckoutNew(name)
+}
+
 func Current(opt *types.Options) (*types.Branch, error) {
 	return with(opt).Current()
 }
@@ -66,6 +70,7 @@ type wrapper interface {
 	List(*ListOption) ([]*types.Branch, error)
 	Create(name string, createOpt *CreateOption) (*types.Branch, error)
 	Checkout(name string) error
+	CheckoutNew(name string) (*types.Branch, error)
 	Current() (*types.Branch, error)
 	DeleteAll(brs []string) error
 }

@@ -59,6 +59,28 @@ func (g goGit) Checkout(name string) error {
     return err
   }
 
+  return g.checkoutBranch(repo, name, false)
+}
+
+func (g goGit) CheckoutNew(name string) (*types.Branch, error) {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return nil, err
+  }
+
+  if err = g.checkoutBranch(repo, name, true); err != nil {
+    return nil, err
+  }
+
+  br, err := repo.Branch(name)
+  if err != nil {
+    return nil, err
+  }
+
+  return &types.Branch{GoGit: br}, nil
+}
+
+func (g goGit) checkoutBranch(repo *git.Repository, name string, create bool) error {
   wt, err := repo.Worktree()
   if err != nil {
     return err
@@ -77,6 +99,7 @@ func (g goGit) Checkout(name string) error {
 
   err = wt.Checkout(&git.CheckoutOptions{
     Branch: branchRef,
+    Create: create,
   })
 
   return err

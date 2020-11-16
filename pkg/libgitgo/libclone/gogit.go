@@ -15,7 +15,7 @@ type goGit struct {
 	auth     *types.Auth
 }
 
-func (g goGit) Start(url string, branch string, bare bool, cloneOpt *Option) (*types.Repository, error) {
+func (g goGit) Start(url string, branch string, bare bool, cloneOpt *Options) (*types.Repository, error) {
 	auth, err := g.auth.GenGoGitAuth(url)
 	if err != nil {
 		return nil, err

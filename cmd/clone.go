@@ -73,11 +73,11 @@ var cloneCmd = &cobra.Command{
 		_, err := libclone.Start(url,
 			commonCloneArgs.Get(parameterKeyBranch),
 			commonCloneArgs.Get(parameterKeyBare) == "true",
-			&libclone.Option{
-				Git2Go: libclone.Git2GoOption{
+			&libclone.Options{
+				Git2Go: libclone.Git2GoOptions{
 					DownloadTags: getDownloadTags(git2go.Get(parameterKeyDownloadTags)),
 				},
-				GoGit: libclone.GoGitOption{
+				GoGit: libclone.GoGitOptions{
 					RemoteName:            gogit.Get(parameterKeyRemote),
 					SingleBranch:          gogit.GetBool(parameterKeySingleBranch),
 					NoCheckout:            gogit.GetBool(parameterKeyNoCheckout),

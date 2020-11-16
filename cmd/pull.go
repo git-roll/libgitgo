@@ -18,7 +18,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/git-roll/libgitgo/pkg/utils"
-	"github.com/git-roll/libgitgo/pkg/wrapper"
 	git "github.com/libgit2/git2go/v31"
 	"os"
 
@@ -34,8 +33,6 @@ var pullCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, "remote branch")
 			return
 		}
-
-		wrapper.FetchOrDie(args[0], args[1])
 
 		pwd := utils.GetPwdOrDie()
 		repo, err := git.OpenRepository(pwd)

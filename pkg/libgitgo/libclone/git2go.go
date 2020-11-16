@@ -9,7 +9,7 @@ type git2go struct {
 	workdir string
 }
 
-func (g git2go) Start(url string, branch string, bare bool, opt *Option) (*types.Repository, error) {
+func (g git2go) Start(url string, branch string, bare bool, opt *Options) (*types.Repository, error) {
 	r, err := git.Clone(url, g.workdir, &git.CloneOptions{
 		FetchOptions:         &git.FetchOptions{
 			RemoteCallbacks: git.RemoteCallbacks{

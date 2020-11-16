@@ -3,6 +3,7 @@ package libcommit
 import (
 	"github.com/git-roll/libgitgo/pkg/libgitgo/types"
 	git "github.com/libgit2/git2go/v31"
+	"golang.org/x/xerrors"
 	"time"
 )
 
@@ -10,8 +11,55 @@ type git2go struct {
 	*types.Options
 }
 
+func (g git2go) Amend(message string, opt *CommitOptions) (commit *types.Commit, err error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return
+	}
+
+	head, err := repo.Head()
+	if err != nil {
+		return
+	}
+
+	headCommit, err := repo.LookupCommit(head.Target())
+	if err != nil {
+		return
+	}
+
+	if headCommit.ParentCount() > 1 {
+		return nil, xerrors.Errorf("can't amend merge commits")
+	}
+
+	headTree, err := headCommit.Tree()
+	if err != nil {
+		return
+	}
+
+	now := time.Now()
+	commitId, err := headCommit.Amend("", &git.Signature{
+		Name:  opt.Author.Name,
+		Email: opt.Author.Email,
+		When:  now,
+	}, &git.Signature{
+		Name:  opt.Author.Name,
+		Email: opt.Author.Email,
+		When:  now,
+	}, message, headTree)
+	if err != nil {
+		return
+	}
+
+	ci, err := repo.LookupCommit(commitId)
+	if err != nil {
+		panic(err)
+	}
+	commit = &types.Commit{Git2Go: ci}
+	return
+}
+
 func (g git2go) CommitStaging(message string, opt *CommitOptions) (commit *types.Commit, err error) {
-	repo, err := g.Options.OpenGit2GoRepo()
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return
 	}
@@ -118,7 +166,7 @@ func (g git2go) CommitStaging(message string, opt *CommitOptions) (commit *types
 }
 
 func (g git2go) Get(refName string) (commit *types.Commit, err error) {
-	repo, err := g.Options.OpenGit2GoRepo()
+	repo, err := g.OpenGit2GoRepo()
 	if err != nil {
 		return
 	}

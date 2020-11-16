@@ -17,8 +17,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libfetch"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libmerge"
 	"github.com/git-roll/libgitgo/pkg/utils"
-	git "github.com/libgit2/git2go/v31"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -34,34 +35,11 @@ var pullCmd = &cobra.Command{
 			return
 		}
 
-		pwd := utils.GetPwdOrDie()
-		repo, err := git.OpenRepository(pwd)
+		err := libfetch.Branch(args[1], args[0], &libfetch.Options{}, options())
 		utils.DieIf(err)
 
-		commit, err := repo.AnnotatedCommitFromRevspec("refs/remotes/"+args[0]+"/"+args[1])
+		err = libmerge.FastForward(args[1], args[0], options())
 		utils.DieIf(err)
-
-		fmt.Println(commit.Id().String())
-
-		analysis, _, err := repo.MergeAnalysis([]*git.AnnotatedCommit{commit})
-		utils.DieIf(err)
-
-		if (analysis & git.MergeAnalysisUpToDate) > 0 {
-			fmt.Println("update-to-date")
-			return
-		}
-
-		if (analysis & git.MergeAnalysisFastForward) == 0 {
-			fmt.Fprintln(os.Stderr, "can't merge if not fast forward")
-			return
-		}
-		
-		head, err := repo.Head()
-		utils.DieIf(err)
-
-		_, err = head.SetTarget(commit.Id(), "")
-		utils.DieIf(err)
-		fmt.Println("HEAD updated")
 	},
 }
 

@@ -55,7 +55,11 @@ func Current(opt *types.Options) (*types.Branch, error) {
 }
 
 func Delete(name string, opt *types.Options) error {
-	return with(opt).Delete(name)
+	return with(opt).DeleteAll([]string{name})
+}
+
+func DeleteAll(branches []string, opt *types.Options) error {
+	return with(opt).DeleteAll(branches)
 }
 
 type wrapper interface {
@@ -63,7 +67,7 @@ type wrapper interface {
 	Create(name string, createOpt *CreateOption) (*types.Branch, error)
 	Checkout(name string) error
 	Current() (*types.Branch, error)
-	Delete(name string) error
+	DeleteAll(brs []string) error
 }
 
 func with(opt *types.Options) wrapper {

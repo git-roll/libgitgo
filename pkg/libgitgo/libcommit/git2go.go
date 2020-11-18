@@ -42,8 +42,8 @@ func (g git2go) Amend(message string, opt *CommitOptions) (commit *types.Commit,
 		Email: opt.Author.Email,
 		When:  now,
 	}, &git.Signature{
-		Name:  opt.Author.Name,
-		Email: opt.Author.Email,
+		Name:  opt.Committer.Name,
+		Email: opt.Committer.Email,
 		When:  now,
 	}, message, headTree)
 	if err != nil {

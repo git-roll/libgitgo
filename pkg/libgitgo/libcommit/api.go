@@ -43,6 +43,4 @@ func with(opt *types.Options) wrapper {
 	default:
 		return &git2go{opt}
 	}
-
-	return nil
 }

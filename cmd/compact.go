@@ -17,12 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/libconfig"
+	"github.com/git-roll/libgitgo/pkg/libgitgo/librebase"
 	"github.com/git-roll/libgitgo/pkg/utils"
-	git "github.com/libgit2/git2go/v31"
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var (
@@ -40,86 +39,17 @@ var compactCmd = &cobra.Command{
 			return
 		}
 
-		repo, err := git.OpenRepository(utils.GetPwdOrDie())
+		opt := options()
+		user, err := libconfig.User(opt)
 		utils.DieIf(err)
 
-		head, err := repo.Head()
-		utils.DieIf(err)
-		branchRef, err := repo.AnnotatedCommitFromRef(head)
-		utils.DieIf(err)
-		upstreamRef, err := repo.AnnotatedCommitFromRevspec(upstream)
-		utils.DieIf(err)
+		err = librebase.CompactPrivateCommits(upstream, prefix, &librebase.RebaseOptions{
+			Author:    user,
+			Committer: user,
+		}, opt)
 
-		opt, err := git.DefaultRebaseOptions()
-		utils.DieIf(err)
-		rebase, err := repo.InitRebase(branchRef, upstreamRef, nil, &opt)
-		utils.DieIf(err)
-
-		sig, err := repo.DefaultSignature()
-		utils.DieIf(err)
-
-		var lastCommit *git.Commit
-		message := ""
-
-		for i := uint(0); i < rebase.OperationCount(); i++ {
-			op := rebase.OperationAt(i)
-			commit, err := repo.LookupCommit(op.Id)
-			utils.DieIf(err)
-
-			if !strings.HasPrefix(commit.Message(), prefix) && lastCommit != nil {
-				applyCommitOrDie(repo, lastCommit, message, sig)
-				message = commit.Message()
-			}
-
-			lastCommit = commit
-		}
-
-		if lastCommit != nil {
-			// apply the commit
-			applyCommitOrDie(repo, lastCommit, message, sig)
-		}
-
-		err = rebase.Finish()
 		utils.DieIf(err)
 	},
-}
-
-func applyCommitOrDie(repo *git.Repository, commit *git.Commit, message string, sig *git.Signature) {
-	head, err := repo.Head()
-	utils.DieIf(err)
-	headCommit, err := repo.LookupCommit(head.Target())
-	utils.DieIf(err)
-
-	targetTree, err := commit.Tree()
-	utils.DieIf(err)
-
-	err = repo.CheckoutTree(targetTree, &git.CheckoutOpts{
-		Strategy:         git.CheckoutSafe | git.CheckoutRecreateMissing ,
-		ProgressCallback: func(path string, completed, total uint) git.ErrorCode{
-			fmt.Println(path, "completed:", completed, "/total:", total)
-			return git.ErrOk
-		},
-	})
-
-	utils.DieIf(err)
-
-	if commit.ParentCount() > 1 || commit.Parent(0).Id() == head.Target() {
-		fmt.Println("can't rebase a merge commit. commit it")
-		// just commit the lastCommit
-		err = repo.SetHeadDetached(commit.Id())
-		utils.DieIf(err)
-		return
-	}
-
-	if len(message) == 0 {
-		message = commit.Message()
-	}
-
-	newCommitID, err := repo.CreateCommit("", sig, sig, message, targetTree, headCommit)
-	utils.DieIf(err)
-
-	err = repo.SetHeadDetached(newCommitID)
-	utils.DieIf(err)
 }
 
 func init() {

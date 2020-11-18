@@ -148,8 +148,8 @@ func (g git2go) CommitStaging(message string, opt *CommitOptions) (commit *types
 		Email: opt.Author.Email,
 		When:  now,
 	}, &git.Signature{
-		Name:  opt.Author.Name,
-		Email: opt.Author.Email,
+		Name:  opt.Committer.Name,
+		Email: opt.Committer.Email,
 		When:  now,
 	}, message, treeOid, parent.Target())
 	if err != nil {

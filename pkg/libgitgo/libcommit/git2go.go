@@ -11,6 +11,31 @@ type git2go struct {
 	*types.Options
 }
 
+func (g git2go) IsAncestor(ancestor, second string) (positive bool, err error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return
+	}
+
+	ancestorRef, err := repo.References.Lookup(ancestor)
+	if err != nil {
+		return
+	}
+
+	secondRef, err := repo.References.Lookup(second)
+	if err != nil {
+		return
+	}
+
+	ancestorOid, err := repo.MergeBase(ancestorRef.Target(), secondRef.Target())
+	if err != nil {
+		return
+	}
+
+	positive = ancestorOid.Equal(ancestorRef.Target())
+	return
+}
+
 func (g git2go) Amend(message string, opt *CommitOptions) (commit *types.Commit, err error) {
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {

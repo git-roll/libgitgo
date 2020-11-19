@@ -28,10 +28,15 @@ func Amend(message string, commitOpt *CommitOptions, opt *types.Options) (*types
 	return with(opt).Amend(message, commitOpt)
 }
 
+func IsAncestor(ancestor, second string, opt *types.Options) (bool, error) {
+	return with(opt).IsAncestor(ancestor, second)
+}
+
 type wrapper interface {
 	Get(ref string) (*types.Commit, error)
 	CommitStaging(message string, commitOpt *CommitOptions) (*types.Commit, error)
 	Amend(message string, commitOpt *CommitOptions) (*types.Commit, error)
+	IsAncestor(ancestor, second string) (bool, error)
 }
 
 func with(opt *types.Options) wrapper {

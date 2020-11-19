@@ -54,7 +54,7 @@ func (g git2go) Start(branch, remote string, opt *MergeOptions) (err error) {
 		(analysis & git.MergeAnalysisFastForward) > 0 && (preference & git.MergePreferenceNoFastForward) == 0 {
 		head, err := repo.Head()
 		if err != nil {
-			return
+			return err
 		}
 
 		_, err = head.SetTarget(commit.Id(), "")

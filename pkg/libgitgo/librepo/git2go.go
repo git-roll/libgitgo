@@ -6,11 +6,25 @@ import (
 )
 
 type git2go struct {
-    workdir string
+    *types.Options
+}
+
+func (g git2go) HEAD() (h *types.HEAD, err error) {
+    repo, err := g.OpenGit2GoRepo()
+    if err != nil {
+        return
+    }
+
+    head, err := repo.Head()
+    if err != nil {
+        return
+    }
+
+    return &types.HEAD{Git2Go: head}, nil
 }
 
 func (g git2go) Start() (*types.Repository, error) {
-    r, err := git.OpenRepository(g.workdir)
+    r, err := g.OpenGit2GoRepo()
     if err != nil {
         return nil, err
     }
@@ -19,7 +33,7 @@ func (g git2go) Start() (*types.Repository, error) {
 }
 
 func (g git2go) Init(bare bool) (repo *types.Repository, err error) {
-    r, err := git.InitRepository(g.workdir, bare)
+    r, err := git.InitRepository(g.Options.WorkDir, bare)
     if err != nil {
         return
     }

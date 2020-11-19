@@ -6,11 +6,25 @@ import (
 )
 
 type goGit struct {
-    workdir string
+    *types.Options
+}
+
+func (g goGit) HEAD() (*types.HEAD, error) {
+    repo, err := g.OpenGoGitRepo()
+    if err != nil {
+        return nil, err
+    }
+
+    head, err := repo.Head()
+    if err != nil {
+        return nil, err
+    }
+
+    return &types.HEAD{GoGit: head}, nil
 }
 
 func (g goGit) Start() (*types.Repository, error) {
-    r, err := git.PlainOpen(g.workdir)
+    r, err := g.OpenGoGitRepo()
     if err != nil {
         return nil, err
     }
@@ -19,7 +33,7 @@ func (g goGit) Start() (*types.Repository, error) {
 }
 
 func (g goGit) Init(bare bool) (repo *types.Repository, err error) {
-    r, err := git.PlainInit(g.workdir, bare)
+    r, err := git.PlainInit(g.Options.WorkDir, bare)
     if err != nil {
         return
     }

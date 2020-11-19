@@ -80,6 +80,20 @@ func (opt *Options) WithContext(ctx context.Context) *Options {
 	return &newOpt
 }
 
+func (opt *Options) WithPreferredLib(lib PreferredLib) *Options {
+	newOpt := *opt
+	newOpt.PreferredLib = lib
+	return &newOpt
+}
+
+func (opt *Options) WithLibGoGit() *Options {
+	return opt.WithPreferredLib(PreferGoGit)
+}
+
+func (opt *Options) WithLibGit2Go() *Options {
+	return opt.WithPreferredLib(PreferGit2Go)
+}
+
 type Auth struct {
 	User       string
 	Password   string

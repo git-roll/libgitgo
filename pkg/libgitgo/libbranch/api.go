@@ -70,6 +70,10 @@ func BranchesHaveMergedTo(name, remote string, opt *types.Options) ([]*types.Bra
 	return with(opt).BranchesHaveMergedTo(name, remote)
 }
 
+func Get(name, remote string, opt *types.Options) (*types.Branch, error) {
+	return with(opt).Current()
+}
+
 type wrapper interface {
 	List(*ListOption) ([]*types.Branch, error)
 	Create(name string, createOpt *CreateOption) (*types.Branch, error)
@@ -78,6 +82,7 @@ type wrapper interface {
 	Current() (*types.Branch, error)
 	DeleteAll(brs []string) error
 	BranchesHaveMergedTo(name, remote string) ([]*types.Branch, error)
+	Get(name, remote string) (*types.Branch, error)
 }
 
 func with(opt *types.Options) wrapper {

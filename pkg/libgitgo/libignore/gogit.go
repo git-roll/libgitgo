@@ -25,12 +25,7 @@ func (g goGit) Check(relativePath string) (err error) {
     return
   }
 
-  patterns, err := gitignore.ReadPatterns(wt.Filesystem, nil)
-  if err != nil {
-    return
-  }
-
-  m := gitignore.NewMatcher(patterns)
+  m := gitignore.NewMatcher(wt.Excludes)
 
   if m.Match([]string{relativePath}, fi.IsDir()) {
     return ErrPathIgnored

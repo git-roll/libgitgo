@@ -13,12 +13,31 @@ type goGit struct {
   *types.Options
 }
 
+func (g goGit) IsAncestor(ancestor, target string) (positive bool, err error) {
+  repo, err := g.OpenGoGitRepo()
+  if err != nil {
+    return
+  }
+
+  ancestorCommit, err := repo.CommitObject(plumbing.NewHash(ancestor))
+  if err != nil {
+    return
+  }
+
+  targetCommit, err := repo.CommitObject(plumbing.NewHash(target))
+  if err != nil {
+    return
+  }
+
+  return ancestorCommit.IsAncestor(targetCommit)
+}
+
 func (g goGit) Amend(_ string, _ *CommitOptions) (*types.Commit, error) {
   return nil, xerrors.Errorf("go-git doesn't support commit amending")
 }
 
 func (g goGit) CommitStaging(message string, opt *CommitOptions) (commit *types.Commit, err error) {
-  repo, err := g.Options.OpenGoGitRepo()
+  repo, err := g.OpenGoGitRepo()
   if err != nil {
     return
   }

@@ -28,18 +28,23 @@ func Open(opt *types.Options) (*types.Repository, error) {
     return repo, err
 }
 
+func HEAD(opt *types.Options) (*types.HEAD, error) {
+    return with(opt).HEAD()
+}
+
 type wrapper interface {
     Init(bare bool) (*types.Repository, error)
     Start() (*types.Repository, error)
+    HEAD() (*types.HEAD, error)
 }
 
 func with(opt *types.Options) wrapper {
     switch opt.PreferredLib {
     case types.PreferGoGit:
-        return &goGit{workdir: opt.WorkDir}
+        return &goGit{opt}
     case types.PreferGit2Go:
         fallthrough
     default:
-        return &git2go{workdir: opt.WorkDir}
+        return &git2go{opt}
     }
 }

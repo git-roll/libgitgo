@@ -14,6 +14,56 @@ type goGit struct {
   *types.Options
 }
 
+func (g goGit) BranchesHaveMergedTo(name, remote string) (brs []*types.Branch, err error) {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return
+  }
+
+  head, err := repo.Head()
+  if err != nil {
+    return
+  }
+
+  headCommit, err := repo.CommitObject(head.Hash())
+  if err != nil {
+    return
+  }
+
+  bri, err := repo.Branches()
+  if err != nil {
+    return
+  }
+
+  err = bri.ForEach(func(br *plumbing.Reference) error {
+    if br.Name().Short() == name {
+      return nil
+    }
+
+    commit, err := repo.CommitObject(br.Hash())
+    if err != nil {
+      return err
+    }
+
+    ancestor, err := commit.IsAncestor(headCommit)
+    if err != nil {
+      return err
+    }
+
+    branch, err := repo.Branch(br.Name().Short())
+    if err != nil {
+      return err
+    }
+
+    if ancestor {
+      brs = append(brs, &types.Branch{GoGit: branch})
+    }
+
+    return nil
+  })
+  return
+}
+
 func (g goGit) Current() (br *types.Branch, err error) {
   repo, err := g.Options.OpenGoGitRepo()
   if err != nil {

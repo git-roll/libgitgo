@@ -11,6 +11,30 @@ type Remote struct {
     GoGit *gogit.Remote
 }
 
+func (r Remote) Name() string {
+    if r.Git2Go != nil {
+        return r.Git2Go.Name()
+    }
+
+    if r.GoGit != nil {
+        return r.GoGit.Config().Name
+    }
+
+    panic("both pointers are nil")
+}
+
+func (r Remote) URL() string {
+    if r.Git2Go != nil {
+        return r.Git2Go.Url()
+    }
+
+    if r.GoGit != nil {
+        return r.GoGit.Config().URLs[0]
+    }
+
+    panic("both pointers are nil")
+}
+
 func (r Remote) String() string {
     if r.Git2Go != nil {
         if r.GoGit != nil {

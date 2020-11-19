@@ -17,10 +17,8 @@ func with(opt *types.Options) wrapper {
     case types.PreferGoGit:
         return &goGit{opt}
     case types.PreferGit2Go:
-        return &git2go{opt}
+        fallthrough
     default:
-        panic(opt.PreferredLib)
+        return &git2go{opt}
     }
-
-    return nil
 }

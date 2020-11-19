@@ -10,6 +10,47 @@ type git2go struct {
 	*types.Options
 }
 
+func (g git2go) BranchesHaveMergedTo(name, remote string) (brs []*types.Branch, err error) {
+	repo, err := g.OpenGit2GoRepo()
+	if err != nil {
+		return
+	}
+
+	targetBr, err := repo.LookupBranch(name, git.BranchAll)
+	if err != nil {
+		return
+	}
+
+	bri, err := repo.NewBranchIterator(git.BranchLocal)
+	if err != nil {
+		return
+	}
+
+	err = bri.ForEach(func(br *git.Branch, _ git.BranchType) error{
+		brName, err := br.Name()
+		if err != nil {
+			return err
+		}
+
+		if brName == name {
+			return nil
+		}
+
+		base, err := repo.MergeBase(br.Target(), targetBr.Target())
+		if err != nil {
+			return err
+		}
+
+		if base == br.Target() {
+			brs = append(brs, &types.Branch{Git2Go: br})
+		}
+
+		return nil
+	})
+
+	return
+}
+
 func (g git2go) Current() (br *types.Branch, err error) {
 	repo, err := g.OpenGit2GoRepo()
 	if err != nil {

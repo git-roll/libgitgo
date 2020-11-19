@@ -11,6 +11,23 @@ type Branch struct {
     GoGit *config.Branch
 }
 
+func (r Branch) Name() string {
+    if r.Git2Go != nil {
+        name, err := r.Git2Go.Name()
+        if err != nil {
+            panic(err)
+        }
+
+        return name
+    }
+
+    if r.GoGit != nil {
+        return r.GoGit.Name
+    }
+
+    panic("both pointers are nil")
+}
+
 func (r Branch) String() string {
     if r.Git2Go != nil {
         if r.GoGit != nil {

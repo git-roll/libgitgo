@@ -14,6 +14,24 @@ type goGit struct {
   *types.Options
 }
 
+func (g goGit) Get(name, remote string) (br *types.Branch, err error) {
+  repo, err := g.Options.OpenGoGitRepo()
+  if err != nil {
+    return
+  }
+
+  brName := name
+  if len(remote) > 0 {
+    brName = remote + "/" + name
+  }
+
+  branch, err := repo.Branch(brName)
+  if err != nil {
+    return
+  }
+  return &types.Branch{GoGit: branch}, nil
+}
+
 func (g goGit) BranchesHaveMergedTo(name, remote string) (brs []*types.Branch, err error) {
   repo, err := g.Options.OpenGoGitRepo()
   if err != nil {

@@ -13,7 +13,7 @@ type goGit struct {
 }
 
 func (g goGit) Start(branch, remoteName string, fetchOpt *Options) (err error) {
-	repo, err := g.Options.OpenGoGitRepo()
+	repo, err := g.OpenGoGitRepo()
 	if err != nil {
 		return
 	}

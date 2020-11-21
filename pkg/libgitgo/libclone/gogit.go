@@ -35,9 +35,9 @@ func (g goGit) Start(url string, branch string, bare bool, cloneOpt *Options) (*
 		SingleBranch:      opt.SingleBranch,
 		NoCheckout:        opt.NoCheckout,
 		Depth:             opt.Depth,
-		RecurseSubmodules: opt.SubmoduleRescursivity,
+		RecurseSubmodules: git.SubmoduleRescursivity(opt.SubmoduleRescursivity),
 		Progress:          g.progress,
-		Tags:              opt.TagMode,
+		Tags:              git.TagMode(opt.TagMode),
 	})
 
 	if err != nil {

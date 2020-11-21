@@ -1,15 +1,15 @@
-package libref
+package libdiff
 
 import (
     "github.com/git-roll/libgitgo/pkg/libgitgo/types"
 )
 
-func List(opt *types.Options) ([]*types.Reference, error) {
-    return with(opt).List()
+func HeadToWorkDir(opt *types.Options) (*types.Diff, error) {
+    return with(opt).HeadToWorkDir()
 }
 
 type wrapper interface {
-    List() ([]*types.Reference, error)
+    HeadToWorkDir() (*types.Diff, error)
 }
 
 func with(opt *types.Options) wrapper {

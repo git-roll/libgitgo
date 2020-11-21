@@ -31,7 +31,7 @@ type wrapper interface {
 func with(opt *types.Options) wrapper {
     switch opt.PreferredLib {
     case types.PreferGoGit:
-        panic("go-git doesn't support to merge branches")
+        panic("go-git doesn't support branch merging")
     case types.PreferGit2Go:
         fallthrough
     default:

@@ -12,19 +12,44 @@ type Options struct {
 	GoGit  GoGitOptions
 }
 
+type Git2GoDownloadTags gitgo.DownloadTags
+
+const (
+	DownloadTagsUnspecified = Git2GoDownloadTags(gitgo.DownloadTagsUnspecified)
+	DownloadTagsAuto        = Git2GoDownloadTags(gitgo.DownloadTagsAuto)
+	DownloadTagsNone        = Git2GoDownloadTags(gitgo.DownloadTagsNone)
+	DownloadTagsAll         = Git2GoDownloadTags(gitgo.DownloadTagsAll)
+)
+
 type Git2GoOptions struct {
-	gitgo.DownloadTags
+	DownloadTags Git2GoDownloadTags
 }
+
+type GoGitSubmoduleRescursivity gogit.SubmoduleRescursivity
+
+const (
+	NoRecurseSubmodules            = GoGitSubmoduleRescursivity(gogit.NoRecurseSubmodules)
+	DefaultSubmoduleRecursionDepth = GoGitSubmoduleRescursivity(gogit.DefaultSubmoduleRecursionDepth)
+)
+
+type GoGitTagMode gogit.TagMode
+
+const (
+	InvalidTagMode = GoGitTagMode(gogit.InvalidTagMode)
+	TagFollowing   = GoGitTagMode(gogit.TagFollowing)
+	AllTags        = GoGitTagMode(gogit.AllTags)
+	NoTags         = GoGitTagMode(gogit.NoTags)
+)
 
 type GoGitOptions struct {
 	// usually `origin`
 	RemoteName string
 	// specified branch only
-	SingleBranch bool
-	NoCheckout   bool
-	Depth        int
-	gogit.SubmoduleRescursivity
-	gogit.TagMode
+	SingleBranch          bool
+	NoCheckout            bool
+	Depth                 int
+	SubmoduleRescursivity GoGitSubmoduleRescursivity
+	TagMode               GoGitTagMode
 }
 
 func Start(url string, branch string, bare bool, cloneOpt *Options, opt *types.Options) (*types.Repository, error) {

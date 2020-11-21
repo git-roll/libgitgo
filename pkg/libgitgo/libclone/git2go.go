@@ -18,7 +18,7 @@ func (g git2go) Start(url string, branch string, bare bool, opt *Options) (*type
 				},
 			},
 			UpdateFetchhead: true,
-			DownloadTags:    opt.Git2Go.DownloadTags,
+			DownloadTags:    git.DownloadTags(opt.Git2Go.DownloadTags),
 		},
 		Bare:                 bare,
 		CheckoutBranch:       branch,
